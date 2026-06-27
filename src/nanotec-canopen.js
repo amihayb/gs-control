@@ -154,6 +154,11 @@ class NanotecCanopen {
   async readCurrent(node) {
     return this.readObj(node, "0x6077", 0, "i16");
   }
+
+  // 0x6075: Motor Rated Current — milliamps (u32).
+  async readRatedCurrent(node) {
+    return this.readObj(node, "0x6075", 0, "u32");
+  }
 }
 
 function sleep(ms) {

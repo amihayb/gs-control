@@ -6,6 +6,7 @@ const MAX_TICKS = 20000;        // hard travel limit (±)
 
 let drive = null;
 let pollTimer = null;
+let ratedCurrentMA = 6900;  // Motor Rated Current in mA (0x6075), read at connect
 
 const $ = id => document.getElementById(id);
 
@@ -132,8 +133,8 @@ async function pollPositions() {
     set("pos2", (Number(raw2)    * TICS2DEG).toFixed(2));
     set("vel1", (Number(vel1raw) * TICS2DEG).toFixed(2));
     set("vel2", (Number(vel2raw) * TICS2DEG).toFixed(2));
-    set("cur1", (Number(cur1raw) / 10).toFixed(2));
-    set("cur2", (Number(cur2raw) / 10).toFixed(2));
+    set("cur1", (Number(cur1raw) * ratedCurrentMA / 1000).toFixed(2));
+    set("cur2", (Number(cur2raw) * ratedCurrentMA / 1000).toFixed(2));
   } catch (e) {
     log(`Poll failed: ${e.message || e}`);
   }
@@ -155,6 +156,14 @@ $("connection-toggle").onchange = async function () {
         log
       });
       await drive.connect();
+
+      // Read rated current once; fall back to default if not supported
+      try {
+        const rc = Number(await drive.readRatedCurrent(1));
+        if (rc > 0) ratedCurrentMA = rc;
+      } catch (_) {}
+      log(`Rated current: ${ratedCurrentMA} mA`);
+
       await pollPositions();   // first read immediately; it reschedules itself
       setConnectedUi(true);
     } catch (e) {
