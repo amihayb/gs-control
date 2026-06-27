@@ -203,58 +203,43 @@ class NanotecCanopen {
    *
    * @param {number} node - CANopen node ID
    * @param {object} opts
-   * @param {number} opts.homingMethod  - 0x6098 value. -1 = "current position as home"
-   *                                     on most Nanotec firmware. Adjust if needed.
-   * @param {number} [opts.saveSubindex=2]  - 0x1010 sub-index for save (2 = application params)
-   * @param {number} [opts.tolerance=10]    - max allowed abs(position) after homing (ticks)
-   * @param {number} [opts.timeoutMs=10000] - timeout for each waiting step (ms)
+   * @param {number} [opts.homingMethod=35]  - 0x6098 value. 35 = "current position as home"
+   *                                           (no movement). Adjust if firmware differs.
+   * @param {number} [opts.saveSubindex=2]   - 0x1010 sub-index (2 = application params)
+   * @param {number} [opts.tolerance=10]     - max allowed abs(position) after homing (ticks)
+   * @param {number} [opts.timeoutMs=10000]  - poll timeout for homing attained (ms)
+   * @param {Function} [opts.onBeforeSave]   - async () => boolean — return false to skip save
    */
   async setCurrentPositionAsHome(node, {
-    homingMethod,
+    homingMethod = 35,
     saveSubindex = 2,
     tolerance    = 10,
     timeoutMs    = 10000,
-    onBeforeSave = null    // async () => boolean — return false to skip save
+    onBeforeSave = null
   } = {}) {
 
-    // ── Step 1: Ensure drive is operational ────────────────────────────────
-    const swBefore = Number(await this.readSdo(node, "0x6041", 0, "u16"));
-    this.log(`[node ${node}] statusword before reset: 0x${swBefore.toString(16).padStart(4,'0')}`);
+    this.log(`[node ${node}] homing start — method ${homingMethod}`);
 
-    if (swBefore & 0x0008) {                                          // bit3 = fault
-      await this.writeSdo(node, "0x6040", 0, "u16", 0x0080);         // fault reset
-    }
-    await this.writeSdo(node, "0x6040", 0, "u16", 0x0006);           // shutdown
-    await this.writeSdo(node, "0x6040", 0, "u16", 0x0007);           // switch on
-    await this.writeSdo(node, "0x6040", 0, "u16", 0x000F);           // enable operation
+    // ── Disable motor first ────────────────────────────────────────────────
+    await this.disableMotor(node);
 
-    const swAfter = Number(await this.readSdo(node, "0x6041", 0, "u16"));
-    this.log(`[node ${node}] statusword after enable: 0x${swAfter.toString(16).padStart(4,'0')}`);
+    // ── Switch to Homing Mode ──────────────────────────────────────────────
+    await this.writeSdo(node, "0x6060", 0, "i8", 6);                 // 6060 = 6
 
-    // ── Step 2: Switch to Homing Mode ─────────────────────────────────────
-    await this.writeSdo(node, "0x6060", 0, "i8", 6);
+    // ── Select homing method (no movement) ────────────────────────────────
+    await this.writeSdo(node, "0x6098", 0, "i8", homingMethod);      // 6098 = 35
 
-    const modeDeadline2 = Date.now() + timeoutMs;
-    while (Date.now() < modeDeadline2) {
-      if (Number(await this.readSdo(node, "0x6061", 0, "i8")) === 6) break;
-      await sleep(200);
-    }
-    const modeCheck = Number(await this.readSdo(node, "0x6061", 0, "i8"));
-    if (modeCheck !== 6) throw new Error(`[node ${node}] timeout waiting for Homing Mode (6061h=${modeCheck})`);
+    // ── Enable operation in Homing Mode ───────────────────────────────────
+    await this.writeSdo(node, "0x6040", 0, "u16", 15);               // 6040 = 15
 
-    // ── Step 3: Configure homing ──────────────────────────────────────────
+    // ── Log position before homing ────────────────────────────────────────
     const posBefore = Number(await this.readSdo(node, "0x6064", 0, "i32"));
     this.log(`[node ${node}] position before homing: ${posBefore} ticks`);
-    this.log(`[node ${node}] homing method: ${homingMethod}`);
 
-    await this.writeSdo(node, "0x6098", 0, "i8",  homingMethod);     // homing method
-    await this.writeSdo(node, "0x607C", 0, "i32", 0);                // home offset = 0
+    // ── Start homing procedure ────────────────────────────────────────────
+    await this.writeSdo(node, "0x6040", 0, "u16", 31);               // 6040 = 31
 
-    // ── Step 4: Execute homing ────────────────────────────────────────────
-    this.log(`[node ${node}] homing start`);
-    await this.writeSdo(node, "0x6040", 0, "u16", 0x000F);           // clear bit4
-    await this.writeSdo(node, "0x6040", 0, "u16", 0x001F);           // start (bit4 rising edge)
-
+    // ── Wait for homing attained (bit 12) ─────────────────────────────────
     const finalSw = await this.waitStatusword(node, sw => {
       return (sw & 0x1000) !== 0   // bit12 = homing attained
           || (sw & 0x2000) !== 0   // bit13 = homing error
@@ -266,7 +251,10 @@ class NanotecCanopen {
     if (finalSw & 0x0008) throw new Error(`[node ${node}] homing aborted — drive fault`);
     if (finalSw & 0x2000) throw new Error(`[node ${node}] homing aborted — homing error`);
 
-    // ── Step 5: Verify position ───────────────────────────────────────────
+    // ── Clear "Start Homing" bit ───────────────────────────────────────────
+    await this.writeSdo(node, "0x6040", 0, "u16", 15);               // 6040 = 15
+
+    // ── Verify position ───────────────────────────────────────────────────
     const posAfter = Number(await this.readSdo(node, "0x6064", 0, "i32"));
     this.log(`[node ${node}] position before: ${posBefore}  after: ${posAfter} ticks`);
 
@@ -274,7 +262,7 @@ class NanotecCanopen {
       throw new Error(`[node ${node}] position after homing (${posAfter}) exceeds tolerance (±${tolerance} ticks)`);
     }
 
-    // ── Step 6: Save parameters ───────────────────────────────────────────
+    // ── Save parameters (optional, user-confirmed) ────────────────────────
     const doSave = onBeforeSave ? await onBeforeSave() : true;
     if (doSave) {
       await this.saveParameters(node, saveSubindex);
@@ -282,18 +270,9 @@ class NanotecCanopen {
       this.log(`[node ${node}] save skipped by user`);
     }
 
-    // ── Step 7: Return to Profile Position Mode ───────────────────────────
-    await this.writeSdo(node, "0x6060", 0, "i8", 1);
-
-    const ppDeadline = Date.now() + timeoutMs;
-    while (Date.now() < ppDeadline) {
-      if (Number(await this.readSdo(node, "0x6061", 0, "i8")) === 1) break;
-      await sleep(200);
-    }
-    const finalMode = Number(await this.readSdo(node, "0x6061", 0, "i8"));
-    this.log(`[node ${node}] final operating mode (6061h): ${finalMode}`);
-
-    if (finalMode !== 1) throw new Error(`[node ${node}] timeout returning to Profile Position Mode`);
+    // ── Return to Profile Position Mode ───────────────────────────────────
+    await this.writeSdo(node, "0x6060", 0, "i8", 1);                 // 6060 = 1
+    this.log(`[node ${node}] returned to Profile Position Mode`);
   }
 }
 

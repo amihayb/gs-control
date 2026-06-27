@@ -3,7 +3,7 @@
 const NODES    = [1, 2];
 const TICS2DEG = 6.3178e-04;   // encoder ticks → degrees
 const MAX_TICKS = 20000;        // hard travel limit (±)
-const HOMING_METHOD = -1;       // Nanotec "set current position as home"
+const HOMING_METHOD = 35;       // Nanotec method 35 = "current position as home" (no movement)
                                 // Change if your firmware uses a different value
 
 let drive = null;
