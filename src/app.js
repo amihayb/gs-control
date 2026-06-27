@@ -133,8 +133,8 @@ async function pollPositions() {
     set("pos2", (Number(raw2)    * TICS2DEG).toFixed(2));
     set("vel1", (Number(vel1raw) * TICS2DEG).toFixed(2));
     set("vel2", (Number(vel2raw) * TICS2DEG).toFixed(2));
-    set("cur1", (Number(cur1raw) * ratedCurrentMA / 1000).toFixed(2));
-    set("cur2", (Number(cur2raw) * ratedCurrentMA / 1000).toFixed(2));
+    set("cur1", (Number(cur1raw) / 1000 * ratedCurrentMA / 1000).toFixed(2));
+    set("cur2", (Number(cur2raw) / 1000 * ratedCurrentMA / 1000).toFixed(2));
   } catch (e) {
     log(`Poll failed: ${e.message || e}`);
   }
