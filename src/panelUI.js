@@ -45,13 +45,10 @@ function MovementControl() {
       <input type="number" id="movementVelocity" value="1000" min="1" style="width:70px;" />
     </div><br>
 
-    <div class="target-control" style="display:flex; justify-content:center; margin-top:10px;">
-      <button id="go"
-              onclick="goToPosition()"
-              style="background-color:var(--color-btn-active); color:var(--color-text-active); min-width:140px;">
-        Go to Position
-      </button>
-    </div><br>
+    <a href="#" class="button" style="display:block;"
+       id="go" onclick="goToPosition(); return false;">
+      Go to Position
+    </a>
 
     <!-- Jog grid: 5×5, big arrows outer, small arrows inner, home center -->
     <div style="display:grid; grid-template-columns:repeat(5,38px); grid-template-rows:repeat(5,38px); gap:4px; margin:12px auto; width:fit-content;">
@@ -97,14 +94,10 @@ function MovementControl() {
 
     <hr>
 
-    <div class="target-control" style="display:flex; justify-content:center; margin-top:16px;">
-      <button id="btn-set-home"
-              onclick="setHomeForAllAxes()"
-              style="background-color:var(--color-btn-active); color:var(--color-text-active);
-                     min-width:220px; padding:10px 16px;">
-        Set Current Position As Home
-      </button>
-    </div>
+    <a href="#" class="button" style="display:block;"
+       id="btn-set-home" onclick="setHomeForAllAxes(); return false;">
+      Set Current Position As Home
+    </a>
   `;
 
   document.body.appendChild(panel);
