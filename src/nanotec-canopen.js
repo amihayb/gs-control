@@ -213,7 +213,8 @@ class NanotecCanopen {
     homingMethod,
     saveSubindex = 2,
     tolerance    = 10,
-    timeoutMs    = 10000
+    timeoutMs    = 10000,
+    onBeforeSave = null    // async () => boolean — return false to skip save
   } = {}) {
 
     // ── Step 1: Ensure drive is operational ────────────────────────────────
@@ -274,7 +275,12 @@ class NanotecCanopen {
     }
 
     // ── Step 6: Save parameters ───────────────────────────────────────────
-    await this.saveParameters(node, saveSubindex);
+    const doSave = onBeforeSave ? await onBeforeSave() : true;
+    if (doSave) {
+      await this.saveParameters(node, saveSubindex);
+    } else {
+      this.log(`[node ${node}] save skipped by user`);
+    }
 
     // ── Step 7: Return to Profile Position Mode ───────────────────────────
     await this.writeSdo(node, "0x6060", 0, "i8", 1);

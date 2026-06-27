@@ -311,7 +311,10 @@ async function setHomeForAllAxes() {
         homingMethod: HOMING_METHOD,
         saveSubindex: 2,
         tolerance:    10,
-        timeoutMs:    10000
+        timeoutMs:    10000,
+        onBeforeSave: () => window.confirm(
+          `Node ${node} homing complete.\n\nSave new home position to non-volatile memory?`
+        )
       });
       log(`Node ${node}: homing and save complete`);
     }
