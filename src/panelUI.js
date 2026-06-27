@@ -54,7 +54,7 @@ function MovementControl() {
     </div><br>
 
     <!-- Jog grid: 5×5, big arrows outer, small arrows inner, home center -->
-    <div style="display:grid; grid-template-columns:54px 38px 54px 38px 54px; grid-template-rows:54px 38px 54px 38px 54px; gap:6px; margin:12px auto; width:fit-content;">
+    <div style="display:grid; grid-template-columns:repeat(5,38px); grid-template-rows:repeat(5,38px); gap:4px; margin:12px auto; width:fit-content;">
       <span></span><span></span>
       <button class="jog-btn jog-big" onclick="jog(2, 5)"  title="+5° Axis 2"><i class="fa fa-arrow-up"></i></button>
       <span></span><span></span>
@@ -94,7 +94,7 @@ function MovementControl() {
 
   document.body.appendChild(panel);
 
-  document.getElementById('main-content').style.marginLeft = '770px';
+  document.getElementById('main-content').style.marginLeft = '720px';
 }
 
 function closeMovementControl() {

@@ -80,7 +80,7 @@ h1 {
 
 /* Movement panel layout */
 .movement-panel {
-  width: 400px;
+  width: 350px;
   position: fixed;
   top: 0;
   left: 350px;
@@ -399,6 +399,8 @@ input[type="text"] {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 38px;
+  height: 38px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -416,23 +418,12 @@ input[type="text"] {
   background-color: var(--color-btn-action);
 }
 
-.jog-small {
-  width: 38px;
-  height: 38px;
-  font-size: 14px;
-}
-
-.jog-big {
-  width: 54px;
-  height: 54px;
-  font-size: 24px;
-}
+.jog-small { font-size: 13px; }
+.jog-big   { font-size: 18px; }
 
 .jog-home {
-  width: 54px;
-  height: 54px;
-  font-size: 22px;
   background-color: var(--color-btn-action);
+  font-size: 16px;
 }
 
 .jog-home:hover {
