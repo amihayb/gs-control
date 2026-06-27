@@ -2,39 +2,101 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nanotec CANopen Control</title>
+  <link href="StyleSheet.css" rel="stylesheet">
+  <!-- Apply saved theme before render to avoid flash -->
+  <script>
+    (function () {
+      var theme = localStorage.getItem('gs-theme') || 'dark';
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
 </head>
 <body>
-  <h1>Nanotec CANopen Control</h1>
+  <!-- Top navigation bar -->
+  <div class="topnav" id="topnav">
+    <span style="padding:14px 20px; font-size:20px; font-weight:bold;">
+      Nanotec CANopen Control
+    </span>
+    <button id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">☾</button>
+  </div>
 
-  <button id="connect">Connect</button>
-  <button id="disconnect" disabled>Disconnect</button>
-  <button id="on" disabled>Motors ON</button>
-  <button id="off" disabled>Motors OFF</button>
+  <!-- Left sidebar -->
+  <div class="sidenav" id="sidenav">
+    <h1>Motor Control</h1>
 
-  <p>Status: <span id="status">Disconnected</span></p>
+    <!-- Connection toggle -->
+    <div class="toggle-container" title="Connect to the controller">
+      <label class="toggle-label" for="connection-toggle">Connection</label>
+      <label class="toggle-container">
+        <input type="checkbox" id="connection-toggle" class="toggle-input">
+        <span class="toggle-slider"></span>
+      </label>
+    </div><br>
 
-  <h2>Positions</h2>
-  <p>Axis 1 position: <span id="pos1">---</span></p>
-  <p>Axis 2 position: <span id="pos2">---</span></p>
+    <!-- Motor toggle -->
+    <div class="toggle-container" title="Enable / disable motors">
+      <label class="toggle-label" for="motor-toggle">Motors On</label>
+      <label class="toggle-container">
+        <input type="checkbox" id="motor-toggle" class="toggle-input" disabled>
+        <span class="toggle-slider"></span>
+      </label>
+    </div><br>
 
-  <h2>Move</h2>
-  <label>Axis 1 target:
-    <input id="target1" type="number" value="0">
-  </label>
-  <br>
+    <!-- Live position table -->
+    <div class="target-control">
+      <table class="parameter-table">
+        <thead>
+          <tr>
+            <th class="param-header">Parameter</th>
+            <th class="axis-header">Ax 1</th>
+            <th class="axis-header">Ax 2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="param-label">Position</td>
+            <td class="param-input-cell">
+              <input type="text" id="pos1" value="---" class="param-input" readonly>
+            </td>
+            <td class="param-input-cell">
+              <input type="text" id="pos2" value="---" class="param-input" readonly>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div><br>
 
-  <label>Axis 2 target:
-    <input id="target2" type="number" value="0">
-  </label>
-  <br><br>
+    <!-- Status -->
+    <div class="target-control" title="Connection status">
+      <label>Status</label>
+      <div id="status" style="font-size:12px; color:var(--color-text-muted); text-align:center;">
+        Disconnected
+      </div>
+    </div>
 
-  <button id="go" disabled>Go to position</button>
+    <br><hr><br>
 
-  <h2>Log</h2>
-  <pre id="log"></pre>
+    <!-- Navigation -->
+    <div>
+      <a href="#" class="button active" id="movement-control-button"
+         title="Movement control interface" onclick="MovementControl(); return false;">
+        Movement Control
+      </a>
+    </div>
+  </div>
+
+  <!-- Main content area -->
+  <div id="main-content" style="margin-left:370px; margin-top:60px; padding:20px;">
+    <h2>Log</h2>
+    <pre id="log"></pre>
+  </div>
 
   <script src="nanotec-canopen.js"></script>
+  <script src="panelUI.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
