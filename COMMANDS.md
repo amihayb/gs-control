@@ -186,20 +186,15 @@ There is no direct "actual current in amps" object in the currently used command
 <node> r 0x6073 0 u16    # Max Current, thousandths of rated current
 ```
 
-Approximate current estimate from torque actual:
+Approximate current in Amps from torque actual:
 
 ```text
-estimated_current_mA = (6077 * 6075) / 1000
+actual_A = (torque_actual_i16 / 1000) × (rated_current_mA / 1000)
 ```
 
-Example:
+Where `rated_current_mA` = value of `0x6075` in mA (e.g. 6900 for a 6.9 A motor).
 
-```text
-1 r 0x6077 0 i16
-1 r 0x6075 0 u32
-```
-
-If `6077 = 500`, it means approximately 50% of rated torque/current.
+Example: if `6077 = 500` and `6075 = 6900`, then `actual_A = 0.5 × 6.9 = 3.45 A`.
 
 ### Drive state / diagnostics
 
@@ -659,6 +654,7 @@ CANopen store parameters object uses the signature `save` = `0x65766173`.
 
 ```text
 <node> w 0x1010 1 u32 0x65766173    # store all parameters
+<node> w 0x1010 6 u32 0x65766173    # store motion / home parameters (used by homing sequence)
 ```
 
 ### Restore defaults

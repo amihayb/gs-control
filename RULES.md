@@ -115,19 +115,40 @@ Only use these entries unless verified in the manuals:
 | `0x6041:00` | `u16` | Statusword |
 | `0x6060:00` | `i8` | Modes of operation |
 | `0x6061:00` | `i8` | Modes of operation display |
-| `0x6064:00` | `i32` | Position actual value |
-| `0x607A:00` | `i32` | Target position |
+| `0x6064:00` | `i32` | Position actual value (ticks) |
+| `0x607A:00` | `i32` | Target position (ticks) |
 | `0x606C:00` | `i32` | Velocity actual value |
+| `0x6077:00` | `i16` | Torque actual value (‰ of rated) |
+| `0x6075:00` | `u32` | Motor rated current (mA) |
+| `0x6098:00` | `i8` | Homing method |
+| `0x607C:00` | `i32` | Home offset |
+| `0x1010:06` | `u32` | Store motion/home parameters to NVM (`0x65766173`) |
 | `0x603F:00` | `u16` | Error code |
 
 Do not invent object indexes, data types, bit meanings, or drive-specific behavior.
+
+## Unit conversion
+
+```js
+TICS2DEG  = 6.3178e-04   // encoder ticks → degrees (display only)
+MAX_TICKS = 20000         // hard travel limit ± on both axes
+```
+
+Current in Amps (from torque actual and rated current):
+
+```js
+actual_A = (torque_actual_i16 / 1000) × (rated_current_mA / 1000)
+```
+
+`rated_current_mA` is read from `0x6075` at connect time; default fallback is 6900 mA.
 
 ## Code organization
 
 Keep responsibilities separated:
 
-- `src/nanotec-canopen.js`: low-level serial, command, CANopen object read/write, enable/disable/move.
-- `src/app.js`: UI state and event handlers.
+- `src/nanotec-canopen.js`: low-level serial, command, CANopen object read/write, enable/disable/move, homing, NVM save.
+- `src/app.js`: UI state and event handlers, polling loop, unit conversion (ticks ↔ degrees, per-mille → Amps).
+- `src/panelUI.js`: dynamically builds the Movement Control sliding panel.
 - `src/index.html`: layout only.
 
 Do not mix UI rendering deeply into `nanotec-canopen.js`.
