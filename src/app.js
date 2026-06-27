@@ -47,45 +47,24 @@ document.addEventListener('DOMContentLoaded', function () {
 // ==================== About ====================
 
 function about() {
-  const existing = document.getElementById('about-modal');
-  if (existing) { existing.remove(); return; }
-
-  const modal = document.createElement('div');
-  modal.id = 'about-modal';
-  modal.classList.add('scenario-submenu');
-  modal.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 30px 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    z-index: 1000;
-    min-width: 340px;
-    text-align: center;
-  `;
-  modal.innerHTML = `
-    <h3 style="margin-top:0;">Nanotec CANopen Control</h3>
-    <p style="color:var(--color-text-muted); margin:16px 0;">
-      Browser-based Web Serial control panel<br>
-      for Nanotec PD6-E-M motors via ZK-USB-CAN-1.
-    </p>
-    <p style="margin:16px 0;">
-      Blau Robotics<br>
-      <a href="mailto:amihay@blaurobotics.co.il"
-         style="color:var(--color-btn-action); text-decoration:none;">
-        amihay@blaurobotics.co.il
-      </a>
-    </p>
-    <button onclick="document.getElementById('about-modal').remove()"
-            style="margin-top:10px; padding:8px 24px;
-                   background:var(--color-btn-action); color:#fff;
-                   border:none; border-radius:8px; cursor:pointer;">
-      Close
-    </button>
-  `;
-  document.body.appendChild(modal);
+  Swal.fire({
+    title: 'Nanotec CANopen Control',
+    html: `
+      <p style="color:var(--color-text-muted); margin:16px 0;">
+        Browser-based Web Serial control panel<br>
+        for Nanotec PD6-E-M motors via ZK-USB-CAN-1.
+      </p>
+      <p style="margin:8px 0;">
+        Blau Robotics &nbsp;·&nbsp;
+        <a href="mailto:amihay@blaurobotics.co.il"
+           style="color:var(--color-btn-action); text-decoration:none;">
+          amihay@blaurobotics.co.il
+        </a>
+      </p>
+    `,
+    confirmButtonText: 'Close',
+    confirmButtonColor: 'var(--color-btn-action)',
+  });
 }
 
 // ==================== UI state ====================
@@ -305,22 +284,51 @@ async function setHomeForAllAxes() {
   const btn = $("btn-set-home");
   if (btn) btn.disabled = true;
   try {
+    // Disable all motors before starting
+    for (const node of NODES) await drive.disableMotor(node);
+    log("Motors disabled — starting homing sequence");
+
+    // Home each axis (save is handled once below)
     for (const node of NODES) {
       log(`=== Homing node ${node} ===`);
       await drive.setCurrentPositionAsHome(node, {
         homingMethod: HOMING_METHOD,
-        saveSubindex: 2,
+        saveSubindex: 6,
         tolerance:    10,
         timeoutMs:    10000,
-        onBeforeSave: () => window.confirm(
-          `Node ${node} homing complete.\n\nSave new home position to non-volatile memory?`
-        )
+        onBeforeSave: () => false   // skip per-node save; ask once after all axes
       });
-      log(`Node ${node}: homing and save complete`);
+      log(`Node ${node}: homing complete`);
     }
-    log("=== All axes homed and saved ===");
+
+    // Ask once for both axes
+    const result = await Swal.fire({
+      title:             'Save Home Position?',
+      text:              'Save the new home to non-volatile memory for both axes?',
+      icon:              'question',
+      showCancelButton:  true,
+      confirmButtonText: 'Save',
+      cancelButtonText:  'Skip',
+      confirmButtonColor: 'var(--color-btn-action)',
+    });
+
+    if (result.isConfirmed) {
+      for (const node of NODES) {
+        await drive.saveParameters(node, 6);
+        log(`Node ${node}: home saved to NVM`);
+      }
+      log("=== All axes homed and saved ===");
+    } else {
+      log("=== All axes homed (save skipped) ===");
+    }
   } catch (e) {
     log(`Homing failed: ${e.message || e}`);
+    Swal.fire({
+      title: 'Homing Failed',
+      text:  e.message || String(e),
+      icon:  'error',
+      confirmButtonColor: 'var(--color-btn-action)',
+    });
   } finally {
     if (btn) btn.disabled = false;
   }
