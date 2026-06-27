@@ -504,3 +504,42 @@ input[type="text"] {
     color: black !important;
   }
 }
+
+/* ==================== SweetAlert2 Theme Overrides ==================== */
+
+.swal2-popup {
+  background-color: var(--color-modal-bg) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.swal2-title {
+  color: var(--color-text-primary) !important;
+}
+
+.swal2-html-container {
+  color: var(--color-text-muted) !important;
+}
+
+.swal2-confirm {
+  background-color: var(--color-btn-action) !important;
+  color: #fff !important;
+}
+
+.swal2-confirm:hover {
+  background-color: var(--color-btn-action-hover) !important;
+}
+
+.swal2-cancel {
+  background-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .swal2-cancel {
+  background-color: #2a3a54 !important;
+  color: var(--color-text-active) !important;
+}
+
+.swal2-icon {
+  border-color: var(--color-btn-action) !important;
+  color: var(--color-btn-action) !important;
+}

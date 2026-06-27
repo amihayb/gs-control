@@ -49,21 +49,11 @@ document.addEventListener('DOMContentLoaded', function () {
 function about() {
   Swal.fire({
     title: 'Nanotec CANopen Control',
-    html: `
-      <p style="color:var(--color-text-muted); margin:16px 0;">
-        Browser-based Web Serial control panel<br>
-        for Nanotec PD6-E-M motors via ZK-USB-CAN-1.
-      </p>
-      <p style="margin:8px 0;">
-        Blau Robotics &nbsp;·&nbsp;
-        <a href="mailto:amihay@blaurobotics.co.il"
-           style="color:var(--color-btn-action); text-decoration:none;">
-          amihay@blaurobotics.co.il
-        </a>
-      </p>
-    `,
-    confirmButtonText: 'Close',
-    confirmButtonColor: 'var(--color-btn-action)',
+    html:  'Browser-based Web Serial control panel<br>for Nanotec PD6-E-M motors via ZK-USB-CAN-1.<br><br>'
+         + 'Blau Robotics<br>'
+         + '<a href="mailto:amihay@blaurobotics.co.il" style="text-decoration:none;">'
+         + 'amihay@blaurobotics.co.il</a><br>Phone: +972-54-6668902',
+    icon: 'info',
   });
 }
 
@@ -309,7 +299,6 @@ async function setHomeForAllAxes() {
       showCancelButton:  true,
       confirmButtonText: 'Save',
       cancelButtonText:  'Skip',
-      confirmButtonColor: 'var(--color-btn-action)',
     });
 
     if (result.isConfirmed) {
@@ -327,7 +316,6 @@ async function setHomeForAllAxes() {
       title: 'Homing Failed',
       text:  e.message || String(e),
       icon:  'error',
-      confirmButtonColor: 'var(--color-btn-action)',
     });
   } finally {
     if (btn) btn.disabled = false;
