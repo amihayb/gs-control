@@ -121,13 +121,25 @@ async function pollPositions() {
   try {
     const raw1 = await drive.readPosition(1);
     const raw2 = await drive.readPosition(2);
-    const pos1 = $("pos1");
-    const pos2 = $("pos2");
-    if (pos1) pos1.value = (Number(raw1) * TICS2DEG).toFixed(3);
-    if (pos2) pos2.value = (Number(raw2) * TICS2DEG).toFixed(3);
+    const vel1raw = await drive.readVelocity(1);
+    const vel2raw = await drive.readVelocity(2);
+    const cur1raw = await drive.readCurrent(1);
+    const cur2raw = await drive.readCurrent(2);
+
+    const set = (id, val) => { const el = $(id); if (el) el.value = val; };
+
+    set("pos1", (Number(raw1)    * TICS2DEG).toFixed(2));
+    set("pos2", (Number(raw2)    * TICS2DEG).toFixed(2));
+    set("vel1", (Number(vel1raw) * TICS2DEG).toFixed(2));
+    set("vel2", (Number(vel2raw) * TICS2DEG).toFixed(2));
+    set("cur1", (Number(cur1raw) / 10).toFixed(2));
+    set("cur2", (Number(cur2raw) / 10).toFixed(2));
   } catch (e) {
-    log(`Position poll failed: ${e.message || e}`);
+    log(`Poll failed: ${e.message || e}`);
   }
+
+  // Reschedule only after this cycle finishes (prevents overlapping reads)
+  if (drive) pollTimer = setTimeout(pollPositions, 500);
 }
 
 // ==================== Connection toggle ====================
@@ -143,8 +155,7 @@ $("connection-toggle").onchange = async function () {
         log
       });
       await drive.connect();
-      pollTimer = setInterval(pollPositions, 500);
-      await pollPositions();
+      await pollPositions();   // first read immediately; it reschedules itself
       setConnectedUi(true);
     } catch (e) {
       log(`Connect failed: ${e.message || e}`);
@@ -154,7 +165,7 @@ $("connection-toggle").onchange = async function () {
     }
   } else {
     // Disconnect
-    clearInterval(pollTimer);
+    clearTimeout(pollTimer);
     pollTimer = null;
     try {
       if (drive) await drive.disconnect();
@@ -162,6 +173,9 @@ $("connection-toggle").onchange = async function () {
       log(`Disconnect failed: ${e.message || e}`);
     }
     drive = null;
+    ['pos1','pos2','vel1','vel2','cur1','cur2'].forEach(id => {
+      const el = $(id); if (el) el.value = '---';
+    });
     setMotorUi(false);
     setConnectedUi(false);
   }

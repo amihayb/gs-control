@@ -144,6 +144,16 @@ class NanotecCanopen {
   async readPosition(node) {
     return this.readObj(node, "0x6064", 0, "i32");
   }
+
+  async readVelocity(node) {
+    return this.readObj(node, "0x606C", 0, "i32");
+  }
+
+  // 0x6077: Torque Actual Value — per-mille of rated current (i16).
+  // See COMMANDS.md §Torque / current-related feedback.
+  async readCurrent(node) {
+    return this.readObj(node, "0x6077", 0, "i16");
+  }
 }
 
 function sleep(ms) {
