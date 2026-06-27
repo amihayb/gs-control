@@ -322,6 +322,45 @@ async function setHomeForAllAxes() {
   }
 }
 
+// ==================== Programs ====================
+
+let _progRunning = false;   // set to false to abort a running program
+
+async function runProgram(steps, label) {
+  if (!drive) { log("Not connected."); return; }
+  if (_progRunning) { log("A program is already running. Stop it first."); return; }
+
+  _progRunning = true;
+  log(`=== ${label} start (${steps.length} steps) ===`);
+
+  try {
+    for (let i = 0; i < steps.length; i++) {
+      if (!_progRunning) { log(`${label} aborted at step ${i + 1}`); return; }
+
+      const { ax1, ax2, waitMs } = steps[i];
+      const t1 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax1 / TICS2DEG)));
+      const t2 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax2 / TICS2DEG)));
+
+      log(`  Step ${i + 1}/${steps.length}: Ax1=${ax1}° Ax2=${ax2}° wait=${waitMs}ms`);
+      await drive.moveAbs(1, t1);
+      await drive.moveAbs(2, t2);
+      await new Promise(r => setTimeout(r, waitMs));
+    }
+    log(`=== ${label} complete ===`);
+  } catch (e) {
+    log(`${label} error: ${e.message || e}`);
+  } finally {
+    _progRunning = false;
+  }
+}
+
+function stopProgram() {
+  if (_progRunning) {
+    _progRunning = false;
+    log("Program stop requested.");
+  }
+}
+
 window.goToPosition      = goToPosition;
 window.motorsOn          = motorsOn;
 window.motorsOff         = motorsOff;
@@ -331,6 +370,9 @@ window.emergencyStop     = emergencyStop;
 window.jog               = jog;
 window.jogHome           = jogHome;
 window.setHomeForAllAxes = setHomeForAllAxes;
+window.runProgram        = runProgram;
+window.stopProgram       = stopProgram;
 
 // Initialise UI state
 setConnectedUi(false);
+MovementControl();
