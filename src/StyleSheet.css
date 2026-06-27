@@ -393,7 +393,44 @@ input[type="text"] {
   border: 1px solid var(--color-border);
 }
 
-/* ==================== Emergency Stop ====================  */
+/* ==================== Jog buttons ==================== */
+
+.jog-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: var(--color-btn-active);
+  color: var(--color-text-active);
+  transition: background-color 0.15s ease;
+  padding: 0;
+}
+
+.jog-btn:hover {
+  background-color: var(--color-btn-hover-deep);
+}
+
+.jog-btn:active {
+  background-color: var(--color-btn-action);
+}
+
+.jog-small { font-size: 13px; }
+.jog-big   { font-size: 18px; }
+
+.jog-home {
+  background-color: var(--color-btn-action);
+  font-size: 16px;
+}
+
+.jog-home:hover {
+  background-color: var(--color-btn-action-hover);
+}
+
+/* ==================== Emergency Stop ==================== */
 
 .connection-stop-sign {
   display: none;

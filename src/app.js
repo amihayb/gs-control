@@ -228,6 +228,24 @@ async function emergencyStop() {
 
 // ==================== Movement panel actions ====================
 
+// Jog: add deltaDeg to the target of one axis, clamp, then move
+function jog(axis, deltaDeg) {
+  const inputId = axis === 1 ? 'target1' : 'target2';
+  const input = $(inputId);
+  if (!input) return;
+  const maxDeg = MAX_TICKS * TICS2DEG;
+  const next = Math.max(-maxDeg, Math.min(maxDeg, (Number(input.value) || 0) + deltaDeg));
+  input.value = next.toFixed(3);
+  goToPosition();
+}
+
+// Home: send both axes to 0°
+function jogHome() {
+  const t1 = $('target1'); if (t1) t1.value = '0';
+  const t2 = $('target2'); if (t2) t2.value = '0';
+  goToPosition();
+}
+
 // Called from the Go to Position button inside panelUI.js
 async function goToPosition() {
   if (!drive) {
@@ -284,6 +302,8 @@ window.motorsOff     = motorsOff;
 window.toggleTheme   = toggleTheme;
 window.about         = about;
 window.emergencyStop = emergencyStop;
+window.jog           = jog;
+window.jogHome       = jogHome;
 
 // Initialise UI state
 setConnectedUi(false);

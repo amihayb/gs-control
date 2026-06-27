@@ -53,6 +53,31 @@ function MovementControl() {
       </button>
     </div><br>
 
+    <!-- Jog grid: 5×5, big arrows outer, small arrows inner, home center -->
+    <div style="display:grid; grid-template-columns:repeat(5,38px); grid-template-rows:repeat(5,38px); gap:4px; margin:12px auto; width:fit-content;">
+      <span></span><span></span>
+      <button class="jog-btn jog-big" onclick="jog(2, 5)"  title="+5° Axis 2"><i class="fa fa-arrow-up"></i></button>
+      <span></span><span></span>
+
+      <span></span><span></span>
+      <button class="jog-btn jog-small" onclick="jog(2, 1)"  title="+1° Axis 2"><i class="fa fa-arrow-up"></i></button>
+      <span></span><span></span>
+
+      <button class="jog-btn jog-big"   onclick="jog(1,-5)"  title="-5° Axis 1"><i class="fa fa-arrow-left"></i></button>
+      <button class="jog-btn jog-small" onclick="jog(1,-1)"  title="-1° Axis 1"><i class="fa fa-arrow-left"></i></button>
+      <button class="jog-btn jog-home"  onclick="jogHome()"  title="Home (0°, 0°)"><i class="fa fa-home"></i></button>
+      <button class="jog-btn jog-small" onclick="jog(1, 1)"  title="+1° Axis 1"><i class="fa fa-arrow-right"></i></button>
+      <button class="jog-btn jog-big"   onclick="jog(1, 5)"  title="+5° Axis 1"><i class="fa fa-arrow-right"></i></button>
+
+      <span></span><span></span>
+      <button class="jog-btn jog-small" onclick="jog(2,-1)"  title="-1° Axis 2"><i class="fa fa-arrow-down"></i></button>
+      <span></span><span></span>
+
+      <span></span><span></span>
+      <button class="jog-btn jog-big"   onclick="jog(2,-5)"  title="-5° Axis 2"><i class="fa fa-arrow-down"></i></button>
+      <span></span><span></span>
+    </div>
+
     <hr>
 
     <div class="target-control" style="display:flex; justify-content:center; margin-top:16px; gap:12px;">
