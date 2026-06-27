@@ -23,17 +23,25 @@ function MovementControl() {
     </div>
 
     <div class="target-control" title="Axis 1 target position">
-      <label for="target1">Axis 1</label>
-      <input type="number" id="target1" value="0" step="1" style="width:70px;" />
+      <label for="target1">Axis 1 [°]</label>
+      <input type="number" id="target1" value="0"
+             step="0.01"
+             min="${-(MAX_TICKS * TICS2DEG).toFixed(3)}"
+             max="${(MAX_TICKS * TICS2DEG).toFixed(3)}"
+             style="width:70px;" />
     </div><br>
 
     <div class="target-control" title="Axis 2 target position">
-      <label for="target2">Axis 2</label>
-      <input type="number" id="target2" value="0" step="1" style="width:70px;" />
+      <label for="target2">Axis 2 [°]</label>
+      <input type="number" id="target2" value="0"
+             step="0.01"
+             min="${-(MAX_TICKS * TICS2DEG).toFixed(3)}"
+             max="${(MAX_TICKS * TICS2DEG).toFixed(3)}"
+             style="width:70px;" />
     </div><br>
 
     <div class="target-control" title="Profile velocity (visual only — not yet wired to move command)">
-      <label for="movementVelocity">Velocity</label>
+      <label for="movementVelocity">Velocity [°/s]</label>
       <input type="number" id="movementVelocity" value="1000" min="1" style="width:70px;" />
     </div><br>
 

@@ -1,6 +1,9 @@
 // UI logic only. Low-level motor protocol is in nanotec-canopen.js.
 
-const NODES = [1, 2];
+const NODES    = [1, 2];
+const TICS2DEG = 6.3178e-04;   // encoder ticks → degrees
+const MAX_TICKS = 20000;        // hard travel limit (±)
+
 let drive = null;
 let pollTimer = null;
 
@@ -116,12 +119,12 @@ function setMotorUi(on) {
 async function pollPositions() {
   if (!drive) return;
   try {
-    const p1 = await drive.readPosition(1);
-    const p2 = await drive.readPosition(2);
+    const raw1 = await drive.readPosition(1);
+    const raw2 = await drive.readPosition(2);
     const pos1 = $("pos1");
     const pos2 = $("pos2");
-    if (pos1) pos1.value = p1;
-    if (pos2) pos2.value = p2;
+    if (pos1) pos1.value = (Number(raw1) * TICS2DEG).toFixed(3);
+    if (pos2) pos2.value = (Number(raw2) * TICS2DEG).toFixed(3);
   } catch (e) {
     log(`Position poll failed: ${e.message || e}`);
   }
@@ -209,10 +212,16 @@ async function goToPosition() {
     return;
   }
   try {
-    const p1 = Number($("target1").value);
-    const p2 = Number($("target2").value);
-    await drive.moveAbs(1, p1);
-    await drive.moveAbs(2, p2);
+    const deg1 = Number($("target1").value);
+    const deg2 = Number($("target2").value);
+
+    const t1 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, deg1 / TICS2DEG)));
+    const t2 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, deg2 / TICS2DEG)));
+
+    log(`Move → Ax1: ${deg1.toFixed(3)}° (${t1} tics)  Ax2: ${deg2.toFixed(3)}° (${t2} tics)`);
+
+    await drive.moveAbs(1, t1);
+    await drive.moveAbs(2, t2);
   } catch (e) {
     log(`Move failed: ${e.message || e}`);
   }
