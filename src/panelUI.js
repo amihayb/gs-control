@@ -81,20 +81,20 @@ function MovementControl() {
     <hr>
 
     <div class="target-control" style="display:flex; justify-content:center; margin-top:16px; gap:8px; flex-wrap:wrap;">
-      <button onclick="runProgram(PROG1, 'Prog 1')"
-              style="background-color:var(--color-btn-default); color:var(--color-text-primary); min-width:80px;">
+      <button id="btn-prog-1" onclick="runProgram(PROG1, 'Prog 1', 'btn-prog-1')"
+              style="background-color:var(--color-btn-active); color:var(--color-text-active); min-width:80px;">
         Prog 1
       </button>
-      <button onclick="runProgram(PROG2, 'Prog 2')"
-              style="background-color:var(--color-btn-default); color:var(--color-text-primary); min-width:80px;">
+      <button id="btn-prog-2" onclick="runProgram(PROG2, 'Prog 2', 'btn-prog-2')"
+              style="background-color:var(--color-btn-active); color:var(--color-text-active); min-width:80px;">
         Prog 2
       </button>
-      <button onclick="runProgram(PROG3, 'Prog 3')"
-              style="background-color:var(--color-btn-default); color:var(--color-text-primary); min-width:80px;">
+      <button id="btn-prog-3" onclick="runProgram(PROG3, 'Prog 3', 'btn-prog-3')"
+              style="background-color:var(--color-btn-active); color:var(--color-text-active); min-width:80px;">
         Prog 3
       </button>
       <button onclick="stopProgram()"
-              style="background-color:var(--color-btn-danger,#c0392b); color:#fff; min-width:60px;" title="Abort running program">
+              style="background-color:var(--color-btn-danger); color:#fff; min-width:60px;" title="Abort running program">
         Stop
       </button>
     </div>
@@ -104,7 +104,7 @@ function MovementControl() {
     <div class="target-control" style="display:flex; justify-content:center; margin-top:16px;">
       <button id="btn-set-home"
               onclick="setHomeForAllAxes()"
-              style="background-color:var(--color-btn-action); color:var(--color-text-active);
+              style="background-color:var(--color-btn-active); color:var(--color-text-active);
                      min-width:220px; padding:10px 16px;">
         Set Current Position As Home
       </button>

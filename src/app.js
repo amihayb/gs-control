@@ -326,11 +326,18 @@ async function setHomeForAllAxes() {
 
 let _progRunning = false;   // set to false to abort a running program
 
-async function runProgram(steps, label) {
+async function runProgram(steps, label, btnId) {
   if (!drive) { log("Not connected."); return; }
   if (_progRunning) { log("A program is already running. Stop it first."); return; }
 
   _progRunning = true;
+  const btn = btnId ? document.getElementById(btnId) : null;
+
+  if (btn) {
+    btn.classList.add('in-progress');
+    btn.style.setProperty('--progress', '0%');
+  }
+
   log(`=== ${label} start (${steps.length} steps) ===`);
 
   try {
@@ -344,6 +351,11 @@ async function runProgram(steps, label) {
       log(`  Step ${i + 1}/${steps.length}: Ax1=${ax1}° Ax2=${ax2}° wait=${waitMs}ms`);
       await drive.moveAbs(1, t1);
       await drive.moveAbs(2, t2);
+
+      // Update progress bar after the move command is sent
+      const pct = Math.round(((i + 1) / steps.length) * 100);
+      if (btn) btn.style.setProperty('--progress', `${pct}%`);
+
       await new Promise(r => setTimeout(r, waitMs));
     }
     log(`=== ${label} complete ===`);
@@ -351,6 +363,12 @@ async function runProgram(steps, label) {
     log(`${label} error: ${e.message || e}`);
   } finally {
     _progRunning = false;
+    if (btn) {
+      btn.style.setProperty('--progress', '100%');
+      await new Promise(r => setTimeout(r, 300));
+      btn.classList.remove('in-progress');
+      btn.style.removeProperty('--progress');
+    }
   }
 }
 

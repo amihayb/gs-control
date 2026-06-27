@@ -8,6 +8,8 @@
   --color-btn-hover-deep: #b8cff7;
   --color-btn-action: #8b9dc3;
   --color-btn-action-hover: #6d7fa3;
+  --color-btn-danger: #c0392b;
+  --color-btn-danger-hover: #a93226;
   --color-text-primary: #344563;
   --color-text-active: #202124;
   --color-text-muted: #6c757d;
@@ -30,6 +32,8 @@
   --color-btn-hover-deep: #354d7a;
   --color-btn-action: #4a6fa5;
   --color-btn-action-hover: #3a5a8c;
+  --color-btn-danger: #e74c3c;
+  --color-btn-danger-hover: #c0392b;
   --color-text-primary: #c8d8f0;
   --color-text-active: #e0eeff;
   --color-text-muted: #5c6e8a;
@@ -141,9 +145,15 @@ h1 {
   color: var(--color-text-active);
 }
 
+hr {
+  border: none;
+  border-top: 1px solid var(--color-btn-active);
+  margin: 4px 0;
+}
+
 .movement-panel hr {
   border: none;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-btn-active);
   margin: 4px 0;
 }
 
@@ -308,6 +318,7 @@ h1 {
   padding-top: 16px;
   padding-bottom: 20px;
   box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+  border-right: 1px solid var(--color-btn-active);
   box-sizing: border-box;
 }
 
@@ -503,6 +514,41 @@ input[type="text"] {
     background: white !important;
     color: black !important;
   }
+}
+
+/* ==================== Program Button Progress Bar ==================== */
+
+.movement-panel button.in-progress {
+  background-color: var(--color-btn-hover-deep) !important;
+  color: #3276a0;
+  cursor: not-allowed;
+  pointer-events: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.movement-panel button.in-progress::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: var(--progress, 0%);
+  background: #3276a0;
+  border-radius: 0 2px 2px 0;
+  transition: width 0.4s ease;
+}
+
+.movement-panel button.in-progress:hover {
+  background-color: var(--color-btn-hover-deep) !important;
+}
+
+[data-theme="dark"] .movement-panel button.in-progress {
+  color: #64d7d6;
+}
+
+[data-theme="dark"] .movement-panel button.in-progress::after {
+  background: #64d7d6;
 }
 
 /* ==================== SweetAlert2 Theme Overrides ==================== */
