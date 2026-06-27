@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function about() {
   Swal.fire({
-    title: 'Nanotec CANopen Control',
+    title: 'Gevasol Stabilit Control',
     html:  'Browser-based Web Serial control panel<br>for Nanotec PD6-E-M motors via ZK-USB-CAN-1.<br><br>'
          + 'Blau Robotics<br>'
          + '<a href="mailto:amihay@blaurobotics.co.il" style="text-decoration:none;">'

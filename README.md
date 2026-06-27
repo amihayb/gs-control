@@ -1,4 +1,4 @@
-# Nanotec Web Control
+# Gevasol Stabilit Control
 
 Browser-only Web Serial control panel for two Nanotec PD6-E-M motors via ZK-USB-CAN-1.
 
