@@ -80,19 +80,19 @@ function MovementControl() {
 
     <hr>
 
-    <div class="target-control" style="display:flex; justify-content:center; margin-top:16px; gap:8px; flex-wrap:wrap;">
-      <button id="btn-prog-1" onclick="runProgram(PROG1, 'Prog 1', 'btn-prog-1')"
-              style="background-color:var(--color-btn-active); color:var(--color-text-active); min-width:80px;">
-        Prog 1
-      </button>
-      <button id="btn-prog-2" onclick="runProgram(PROG2, 'Prog 2', 'btn-prog-2')"
-              style="background-color:var(--color-btn-active); color:var(--color-text-active); min-width:80px;">
-        Prog 2
-      </button>
-      <button id="btn-prog-3" onclick="runProgram(PROG3, 'Prog 3', 'btn-prog-3')"
-              style="background-color:var(--color-btn-active); color:var(--color-text-active); min-width:80px;">
-        Prog 3
-      </button>
+    <div style="margin-top:16px;">
+      <a href="#" class="button" style="display:block;"
+         id="btn-prog-1" onclick="runProgram(PROG1, 'Program 1', 'btn-prog-1'); return false;">
+        Program 1
+      </a>
+      <a href="#" class="button" style="display:block;"
+         id="btn-prog-2" onclick="runProgram(PROG2, 'Program 2', 'btn-prog-2'); return false;">
+        Program 2
+      </a>
+      <a href="#" class="button" style="display:block;"
+         id="btn-prog-3" onclick="runProgram(PROG3, 'Program 3', 'btn-prog-3'); return false;">
+        Program 3
+      </a>
     </div>
 
     <hr>

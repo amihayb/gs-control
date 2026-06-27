@@ -433,12 +433,12 @@ input[type="text"] {
 .jog-big   { font-size: 18px; }
 
 .jog-home {
-  background-color: var(--color-btn-action);
+  background-color: var(--color-btn-active);
   font-size: 16px;
 }
 
 .jog-home:hover {
-  background-color: var(--color-btn-action-hover);
+  background-color: var(--color-btn-hover-deep);
 }
 
 /* ==================== Emergency Stop ==================== */
@@ -518,7 +518,8 @@ input[type="text"] {
 
 /* ==================== Program Button Progress Bar ==================== */
 
-.movement-panel button.in-progress {
+.movement-panel button.in-progress,
+.movement-panel a.button.in-progress {
   background-color: var(--color-btn-hover-deep) !important;
   color: #3276a0;
   cursor: not-allowed;
@@ -527,7 +528,8 @@ input[type="text"] {
   overflow: hidden;
 }
 
-.movement-panel button.in-progress::after {
+.movement-panel button.in-progress::after,
+.movement-panel a.button.in-progress::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -539,15 +541,18 @@ input[type="text"] {
   transition: width 0.4s ease;
 }
 
-.movement-panel button.in-progress:hover {
+.movement-panel button.in-progress:hover,
+.movement-panel a.button.in-progress:hover {
   background-color: var(--color-btn-hover-deep) !important;
 }
 
-[data-theme="dark"] .movement-panel button.in-progress {
+[data-theme="dark"] .movement-panel button.in-progress,
+[data-theme="dark"] .movement-panel a.button.in-progress {
   color: #64d7d6;
 }
 
-[data-theme="dark"] .movement-panel button.in-progress::after {
+[data-theme="dark"] .movement-panel button.in-progress::after,
+[data-theme="dark"] .movement-panel a.button.in-progress::after {
   background: #64d7d6;
 }
 
