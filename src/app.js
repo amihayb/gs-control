@@ -218,6 +218,15 @@ function jogHome() {
   goToPosition();
 }
 
+// Ensure motors are on before moving — called by goToPosition and runProgram
+async function ensureMotorsOn() {
+  if (!$("motor-toggle").checked) {
+    log("Motors were off — enabling motors...");
+    await drive.motorsOn();
+    setMotorUi(true);
+  }
+}
+
 // Called from the Go to Position button inside panelUI.js
 async function goToPosition() {
   if (!drive) {
@@ -226,6 +235,7 @@ async function goToPosition() {
   }
   abortProgram();
   try {
+    await ensureMotorsOn();
     const deg1 = Number($("target1").value);
     const deg2 = Number($("target2").value);
 
@@ -371,6 +381,7 @@ async function runProgram(steps, label, btnId) {
   // Store the promise so switchers can await cleanup
   _progDone = (async () => {
     try {
+      await ensureMotorsOn();
       for (let i = 0; i < steps.length; i++) {
         if (!_progRunning) { log(`${label} aborted at step ${i + 1}`); return; }
 
