@@ -99,6 +99,9 @@ function setConnectedUi(connected) {
   if (!connected) {
     $("motor-toggle").checked = false;
   }
+
+  const stopSign = $("emergency-stop");
+  if (stopSign) stopSign.classList.toggle('connected', connected);
 }
 
 function setMotorUi(on) {
@@ -184,6 +187,19 @@ $("motor-toggle").onchange = async function () {
   }
 };
 
+// ==================== Emergency stop ====================
+
+async function emergencyStop() {
+  if (!drive) return;
+  log("EMERGENCY STOP");
+  try {
+    await drive.motorsOff();
+    setMotorUi(false);
+  } catch (e) {
+    log(`Emergency stop error: ${e.message || e}`);
+  }
+}
+
 // ==================== Movement panel actions ====================
 
 // Called from the Go to Position button inside panelUI.js
@@ -230,11 +246,12 @@ async function motorsOff() {
   }
 }
 
-window.goToPosition = goToPosition;
-window.motorsOn     = motorsOn;
-window.motorsOff    = motorsOff;
-window.toggleTheme  = toggleTheme;
-window.about        = about;
+window.goToPosition  = goToPosition;
+window.motorsOn      = motorsOn;
+window.motorsOff     = motorsOff;
+window.toggleTheme   = toggleTheme;
+window.about         = about;
+window.emergencyStop = emergencyStop;
 
 // Initialise UI state
 setConnectedUi(false);
