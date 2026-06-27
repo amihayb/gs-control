@@ -93,10 +93,6 @@ function MovementControl() {
               style="background-color:var(--color-btn-active); color:var(--color-text-active); min-width:80px;">
         Prog 3
       </button>
-      <button onclick="stopProgram()"
-              style="background-color:var(--color-btn-danger); color:#fff; min-width:60px;" title="Abort running program">
-        Stop
-      </button>
     </div>
 
     <hr>

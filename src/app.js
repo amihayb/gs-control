@@ -188,6 +188,7 @@ $("motor-toggle").onchange = async function () {
 
 async function emergencyStop() {
   if (!drive) return;
+  abortProgram();
   log("EMERGENCY STOP");
   try {
     await drive.motorsOff();
@@ -223,6 +224,7 @@ async function goToPosition() {
     log("Not connected.");
     return;
   }
+  abortProgram();
   try {
     const deg1 = Number($("target1").value);
     const deg2 = Number($("target2").value);
@@ -259,6 +261,7 @@ async function motorsOff() {
     log("Not connected.");
     return;
   }
+  abortProgram();
   try {
     await drive.motorsOff();
     setMotorUi(false);
@@ -324,11 +327,18 @@ async function setHomeForAllAxes() {
 
 // ==================== Programs ====================
 
-let _progRunning = false;   // set to false to abort a running program
+let _progRunning = false;
+let _progDone    = Promise.resolve();   // resolves when current program fully exits
 
 async function runProgram(steps, label, btnId) {
   if (!drive) { log("Not connected."); return; }
-  if (_progRunning) { log("A program is already running. Stop it first."); return; }
+
+  // Abort any running program and wait for it to fully clean up
+  if (_progRunning) {
+    log(`Switching to ${label} — aborting current program`);
+    _progRunning = false;
+    await _progDone;
+  }
 
   _progRunning = true;
   const btn = btnId ? document.getElementById(btnId) : null;
@@ -338,8 +348,7 @@ async function runProgram(steps, label, btnId) {
     btn.style.setProperty('--progress', '0%');
   }
 
-  // Continuous smooth progress based on elapsed time vs total wait time
-  const totalMs  = steps.reduce((sum, s) => sum + s.waitMs, 0);
+  const totalMs   = steps.reduce((sum, s) => sum + s.waitMs, 0);
   const startTime = Date.now();
   const progressInterval = setInterval(() => {
     const pct = Math.min(99, Math.round(((Date.now() - startTime) / totalMs) * 100));
@@ -348,38 +357,42 @@ async function runProgram(steps, label, btnId) {
 
   log(`=== ${label} start (${steps.length} steps, ~${(totalMs / 1000).toFixed(1)}s) ===`);
 
-  try {
-    for (let i = 0; i < steps.length; i++) {
-      if (!_progRunning) { log(`${label} aborted at step ${i + 1}`); return; }
+  // Store the promise so switchers can await cleanup
+  _progDone = (async () => {
+    try {
+      for (let i = 0; i < steps.length; i++) {
+        if (!_progRunning) { log(`${label} aborted at step ${i + 1}`); return; }
 
-      const { ax1, ax2, waitMs } = steps[i];
-      const t1 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax1 / TICS2DEG)));
-      const t2 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax2 / TICS2DEG)));
+        const { ax1, ax2, waitMs } = steps[i];
+        const t1 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax1 / TICS2DEG)));
+        const t2 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax2 / TICS2DEG)));
 
-      log(`  Step ${i + 1}/${steps.length}: Ax1=${ax1}° Ax2=${ax2}° wait=${waitMs}ms`);
-      await drive.moveAbs(1, t1);
-      await drive.moveAbs(2, t2);
-      await new Promise(r => setTimeout(r, waitMs));
+        log(`  Step ${i + 1}/${steps.length}: Ax1=${ax1}° Ax2=${ax2}° wait=${waitMs}ms`);
+        await drive.moveAbs(1, t1);
+        await drive.moveAbs(2, t2);
+        await new Promise(r => setTimeout(r, waitMs));
+      }
+      if (_progRunning) log(`=== ${label} complete ===`);
+    } catch (e) {
+      log(`${label} error: ${e.message || e}`);
+    } finally {
+      clearInterval(progressInterval);
+      _progRunning = false;
+      if (btn) {
+        btn.style.setProperty('--progress', '100%');
+        await new Promise(r => setTimeout(r, 300));
+        btn.classList.remove('in-progress');
+        btn.style.removeProperty('--progress');
+      }
     }
-    log(`=== ${label} complete ===`);
-  } catch (e) {
-    log(`${label} error: ${e.message || e}`);
-  } finally {
-    clearInterval(progressInterval);
-    _progRunning = false;
-    if (btn) {
-      btn.style.setProperty('--progress', '100%');
-      await new Promise(r => setTimeout(r, 300));
-      btn.classList.remove('in-progress');
-      btn.style.removeProperty('--progress');
-    }
-  }
+  })();
+
+  await _progDone;
 }
 
-function stopProgram() {
+function abortProgram() {
   if (_progRunning) {
     _progRunning = false;
-    log("Program stop requested.");
   }
 }
 
@@ -393,7 +406,6 @@ window.jog               = jog;
 window.jogHome           = jogHome;
 window.setHomeForAllAxes = setHomeForAllAxes;
 window.runProgram        = runProgram;
-window.stopProgram       = stopProgram;
 
 // Initialise UI state
 setConnectedUi(false);
