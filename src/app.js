@@ -3,6 +3,8 @@
 const NODES    = [1, 2];
 const TICS2DEG = 6.3178e-04;   // encoder ticks → degrees
 const MAX_TICKS = 20000;        // hard travel limit (±)
+const HOMING_METHOD = -1;       // Nanotec "set current position as home"
+                                // Change if your firmware uses a different value
 
 let drive = null;
 let pollTimer = null;
@@ -296,14 +298,40 @@ async function motorsOff() {
   }
 }
 
-window.goToPosition  = goToPosition;
-window.motorsOn      = motorsOn;
-window.motorsOff     = motorsOff;
-window.toggleTheme   = toggleTheme;
-window.about         = about;
-window.emergencyStop = emergencyStop;
-window.jog           = jog;
-window.jogHome       = jogHome;
+// ==================== Homing ====================
+
+async function setHomeForAllAxes() {
+  if (!drive) { log("Not connected."); return; }
+  const btn = $("btn-set-home");
+  if (btn) btn.disabled = true;
+  try {
+    for (const node of NODES) {
+      log(`=== Homing node ${node} ===`);
+      await drive.setCurrentPositionAsHome(node, {
+        homingMethod: HOMING_METHOD,
+        saveSubindex: 2,
+        tolerance:    10,
+        timeoutMs:    10000
+      });
+      log(`Node ${node}: homing and save complete`);
+    }
+    log("=== All axes homed and saved ===");
+  } catch (e) {
+    log(`Homing failed: ${e.message || e}`);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+window.goToPosition      = goToPosition;
+window.motorsOn          = motorsOn;
+window.motorsOff         = motorsOff;
+window.toggleTheme       = toggleTheme;
+window.about             = about;
+window.emergencyStop     = emergencyStop;
+window.jog               = jog;
+window.jogHome           = jogHome;
+window.setHomeForAllAxes = setHomeForAllAxes;
 
 // Initialise UI state
 setConnectedUi(false);

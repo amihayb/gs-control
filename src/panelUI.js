@@ -90,6 +90,17 @@ function MovementControl() {
         Prog 2
       </button>
     </div>
+
+    <hr>
+
+    <div class="target-control" style="display:flex; justify-content:center; margin-top:16px;">
+      <button id="btn-set-home"
+              onclick="setHomeForAllAxes()"
+              style="background-color:var(--color-btn-action); color:var(--color-text-active);
+                     min-width:220px; padding:10px 16px;">
+        Set Current Position As Home
+      </button>
+    </div>
   `;
 
   document.body.appendChild(panel);
