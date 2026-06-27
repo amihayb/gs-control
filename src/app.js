@@ -274,6 +274,17 @@ async function motorsOff() {
 
 async function setHomeForAllAxes() {
   if (!drive) { log("Not connected."); return; }
+
+  const confirm = await Swal.fire({
+    title:             'Set Home Position?',
+    text:              'This will run the homing sequence on both axes and set the current position as home. Continue?',
+    icon:              'warning',
+    showCancelButton:  true,
+    confirmButtonText: 'Yes, set home',
+    cancelButtonText:  'Cancel',
+  });
+  if (!confirm.isConfirmed) { log("Homing cancelled."); return; }
+
   const btn = $("btn-set-home");
   if (btn) btn.disabled = true;
   try {
