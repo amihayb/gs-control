@@ -56,13 +56,13 @@ function MovementControl() {
     <hr>
 
     <div class="target-control" style="display:flex; justify-content:center; margin-top:16px; gap:12px;">
-      <button onclick="motorsOn()"
-              style="background-color:var(--color-btn-action); color:var(--color-text-active); min-width:100px;">
-        Motors ON
+      <button onclick=""
+              style="background-color:var(--color-btn-default); color:var(--color-text-primary); min-width:100px; cursor:default;">
+        Prog 1
       </button>
-      <button onclick="motorsOff()"
-              style="background-color:var(--color-btn-action); color:var(--color-text-active); min-width:100px;">
-        Motors OFF
+      <button onclick=""
+              style="background-color:var(--color-btn-default); color:var(--color-text-primary); min-width:100px; cursor:default;">
+        Prog 2
       </button>
     </div>
   `;
