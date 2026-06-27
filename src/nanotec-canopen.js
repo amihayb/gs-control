@@ -212,7 +212,7 @@ class NanotecCanopen {
    */
   async setCurrentPositionAsHome(node, {
     homingMethod = 35,
-    saveSubindex = 2,
+    saveSubindex = 6,
     tolerance    = 10,
     timeoutMs    = 10000,
     onBeforeSave = null

@@ -1,6 +1,9 @@
 # PDF manuals (large files, not tracked in Git)
 docs/**/*.pdf
 
+# Utility / dev scripts
+src/images/imgComp.py
+
 # Windows
 Thumbs.db
 desktop.ini
