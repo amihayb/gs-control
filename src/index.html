@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nanotec CANopen Control</title>
   <link href="StyleSheet.css" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/font-awesome.min.css">
   <!-- Apply saved theme before render to avoid flash -->
   <script>
     (function () {
@@ -18,10 +19,12 @@
 <body>
   <!-- Top navigation bar -->
   <div class="topnav" id="topnav">
-    <span style="padding:14px 20px; font-size:20px; font-weight:bold;">
-      Nanotec CANopen Control
-    </span>
-    <button id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">☾</button>
+    <img src="images/gevasol-logo.svg" alt="Gevasol" id="gevasolLogo" class="headImg">
+    <button id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">
+      <i class="fa fa-moon-o" id="theme-icon"></i>
+    </button>
+    <a onclick="about()" title="About"><i class="fa fa-info-circle"></i></a>
+    <img src="images/logo-title.svg" alt="Blau Robotics" id="LogoBlau" height="36">
   </div>
 
   <!-- Left sidebar -->

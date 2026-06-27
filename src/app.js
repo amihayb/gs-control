@@ -14,26 +14,73 @@ function log(message) {
 
 // ==================== Theme ====================
 
+function updateThemeIcon(theme) {
+  const icon = $('theme-icon');
+  if (!icon) return;
+  icon.className = theme === 'light' ? 'fa fa-sun-o' : 'fa fa-moon-o';
+}
+
 function toggleTheme() {
   const html = document.documentElement;
   const isDark = html.getAttribute('data-theme') === 'dark';
   if (isDark) {
     html.removeAttribute('data-theme');
     localStorage.setItem('gs-theme', 'light');
-    $('theme-toggle-btn').textContent = '☾';
+    updateThemeIcon('light');
   } else {
     html.setAttribute('data-theme', 'dark');
     localStorage.setItem('gs-theme', 'dark');
-    $('theme-toggle-btn').textContent = '☀';
+    updateThemeIcon('dark');
   }
 }
 
-// Set initial icon to match applied theme
-(function () {
-  const theme = localStorage.getItem('gs-theme') || 'dark';
-  const btn = $('theme-toggle-btn');
-  if (btn) btn.textContent = theme === 'dark' ? '☀' : '☾';
-})();
+document.addEventListener('DOMContentLoaded', function () {
+  updateThemeIcon(localStorage.getItem('gs-theme') || 'dark');
+});
+
+// ==================== About ====================
+
+function about() {
+  const existing = document.getElementById('about-modal');
+  if (existing) { existing.remove(); return; }
+
+  const modal = document.createElement('div');
+  modal.id = 'about-modal';
+  modal.classList.add('scenario-submenu');
+  modal.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 1000;
+    min-width: 340px;
+    text-align: center;
+  `;
+  modal.innerHTML = `
+    <h3 style="margin-top:0;">Nanotec CANopen Control</h3>
+    <p style="color:var(--color-text-muted); margin:16px 0;">
+      Browser-based Web Serial control panel<br>
+      for Nanotec PD6-E-M motors via ZK-USB-CAN-1.
+    </p>
+    <p style="margin:16px 0;">
+      Blau Robotics<br>
+      <a href="mailto:amihay@blaurobotics.co.il"
+         style="color:var(--color-btn-action); text-decoration:none;">
+        amihay@blaurobotics.co.il
+      </a>
+    </p>
+    <button onclick="document.getElementById('about-modal').remove()"
+            style="margin-top:10px; padding:8px 24px;
+                   background:var(--color-btn-action); color:#fff;
+                   border:none; border-radius:8px; cursor:pointer;">
+      Close
+    </button>
+  `;
+  document.body.appendChild(modal);
+}
 
 // ==================== UI state ====================
 
@@ -187,6 +234,7 @@ window.goToPosition = goToPosition;
 window.motorsOn     = motorsOn;
 window.motorsOff    = motorsOff;
 window.toggleTheme  = toggleTheme;
+window.about        = about;
 
 // Initialise UI state
 setConnectedUi(false);

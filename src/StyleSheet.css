@@ -266,13 +266,31 @@ h1 {
   cursor: pointer;
   border-radius: 12px;
   transition: background-color 0.15s ease;
-  margin-left: auto;
-  margin-right: 20px;
 }
 
 #theme-toggle-btn:hover {
   background-color: var(--color-btn-active);
   color: var(--color-text-active);
+}
+
+#theme-icon {
+  display: block;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+#theme-toggle-btn:active #theme-icon {
+  opacity: 0.6;
+  transform: rotate(30deg);
+}
+
+.headImg {
+  padding: 6px 16px;
+  height: 36px;
+}
+
+#LogoBlau {
+  margin-left: auto;
+  margin-right: 20px;
 }
 
 .sidenav {
