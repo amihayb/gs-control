@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Nanotec CANopen Control</title>
+</head>
+<body>
+  <h1>Nanotec CANopen Control</h1>
+
+  <button id="connect">Connect</button>
+  <button id="disconnect" disabled>Disconnect</button>
+  <button id="on" disabled>Motors ON</button>
+  <button id="off" disabled>Motors OFF</button>
+
+  <p>Status: <span id="status">Disconnected</span></p>
+
+  <h2>Positions</h2>
+  <p>Axis 1 position: <span id="pos1">---</span></p>
+  <p>Axis 2 position: <span id="pos2">---</span></p>
+
+  <h2>Move</h2>
+  <label>Axis 1 target:
+    <input id="target1" type="number" value="0">
+  </label>
+  <br>
+
+  <label>Axis 2 target:
+    <input id="target2" type="number" value="0">
+  </label>
+  <br><br>
+
+  <button id="go" disabled>Go to position</button>
+
+  <h2>Log</h2>
+  <pre id="log"></pre>
+
+  <script src="nanotec-canopen.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

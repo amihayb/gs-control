@@ -1,0 +1,9 @@
+# PDF manuals (large files, not tracked in Git)
+docs/**/*.pdf
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
