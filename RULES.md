@@ -146,10 +146,10 @@ actual_A = (torque_actual_i16 / 1000) × (rated_current_mA / 1000)
 
 Keep responsibilities separated:
 
-- `src/nanotec-canopen.js`: low-level serial, command, CANopen object read/write, enable/disable/move, homing, NVM save.
-- `src/app.js`: UI state and event handlers, polling loop, unit conversion (ticks ↔ degrees, per-mille → Amps).
-- `src/panelUI.js`: dynamically builds the Movement Control sliding panel.
-- `src/index.html`: layout only.
+- `nanotec-canopen.js`: low-level serial, command, CANopen object read/write, enable/disable/move, homing, NVM save.
+- `app.js`: UI state and event handlers, polling loop, unit conversion (ticks ↔ degrees, per-mille → Amps).
+- `panelUI.js`: dynamically builds the Movement Control sliding panel.
+- `index.html`: layout only.
 
 Do not mix UI rendering deeply into `nanotec-canopen.js`.
 

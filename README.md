@@ -20,11 +20,11 @@ Travel is clamped to ±20 000 ticks on both axes.
 
 | File | Responsibility |
 |---|---|
-| `src/nanotec-canopen.js` | Low-level serial, CANopen SDO read/write, enable/disable/move/homing |
-| `src/app.js` | UI state, event handlers, polling, unit conversion |
-| `src/panelUI.js` | Movement Control sliding panel — buttons, jog grid, target inputs |
-| `src/UserPrograms.js` | Pre-defined motion programs (Prog 1 / 2 / 3) |
-| `src/index.html` | Layout only |
-| `src/StyleSheet.css` | Visual style |
+| `nanotec-canopen.js` | Low-level serial, CANopen SDO read/write, enable/disable/move/homing |
+| `app.js` | UI state, event handlers, polling, unit conversion |
+| `panelUI.js` | Movement Control sliding panel — buttons, jog grid, target inputs |
+| `UserPrograms.js` | Pre-defined motion programs (Prog 1 / 2 / 3) |
+| `index.html` | Layout only |
+| `StyleSheet.css` | Visual style |
 
 Read `RULES.md` before changing motor-control code.
