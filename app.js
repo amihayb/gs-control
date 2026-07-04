@@ -102,8 +102,8 @@ async function pollPositions() {
 
     set("pos1", (Number(raw1)    * TICS2DEG).toFixed(2));
     set("pos2", (Number(raw2)    * TICS2DEG).toFixed(2));
-    set("vel1", (Number(vel1raw) * TICS2DEG).toFixed(2));
-    set("vel2", (Number(vel2raw) * TICS2DEG).toFixed(2));
+    set("vel1", (Number(vel1raw) * TICS2DEG * 60).toFixed(2));
+    set("vel2", (Number(vel2raw) * TICS2DEG * 60).toFixed(2));
     set("cur1", (Number(cur1raw) / 1000 * ratedCurrentMA / 1000).toFixed(2));
     set("cur2", (Number(cur2raw) / 1000 * ratedCurrentMA / 1000).toFixed(2));
   } catch (e) {
@@ -253,7 +253,12 @@ async function goToPosition() {
     const t1 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, deg1 / TICS2DEG)));
     const t2 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, deg2 / TICS2DEG)));
 
-    log(`Move → Ax1: ${deg1.toFixed(3)}° (${t1} tics)  Ax2: ${deg2.toFixed(3)}° (${t2} tics)`);
+    const velDeg = Math.max(2, Math.min(20, Number($("movementVelocity").value) || 15));
+    const velTicks = Math.round(velDeg / (TICS2DEG * 60));
+
+    log(`Move → Ax1: ${deg1.toFixed(3)}° (${t1} tics)  Ax2: ${deg2.toFixed(3)}° (${t2} tics)  Vel: ${velDeg}°/s (${velTicks})`);
+
+    for (const node of NODES) await drive.writeObj(node, "0x6081", 0, "u32", velTicks);
 
     await drive.moveAbs(1, t1);
     await drive.moveAbs(2, t2);
@@ -532,6 +537,7 @@ async function handleConsoleCommand(input) {
   let type = cmd.type || SDO_TYPES[cmd.key];
 
   if (!type) {
+    await new Promise(r => setTimeout(r, 100)); // let keyup event fire before Swal steals focus
     const result = await Swal.fire({
       title: `Unknown object ${cmd.key}`,
       text: 'Select the data type to use:',

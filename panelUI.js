@@ -43,9 +43,9 @@ function MovementControl() {
              style="width:70px;" />
     </div><br>
 
-    <div class="target-control" title="Profile velocity (visual only — not yet wired to move command)">
+    <div class="target-control" title="Profile velocity for moves">
       <label for="movementVelocity">Velocity [°/s]</label>
-      <input type="number" id="movementVelocity" value="1000" min="1" style="width:70px;" />
+      <input type="number" id="movementVelocity" value="15" min="2" max="20" style="width:70px;" />
     </div><br>
 
     <a href="#" class="button" style="display:block;"

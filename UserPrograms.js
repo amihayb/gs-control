@@ -24,6 +24,7 @@ const PROG1 = [
   { ax1: -15, ax2: -15, waitMs: 2000 },
   { ax1:   0, ax2: -15, waitMs: 2000 },
   { ax1:  15, ax2: -15, waitMs: 2000 },
+  { ax1:  15, ax2:   0, waitMs: 2000 },
   { ax1:   0, ax2:   0, waitMs: 1000 },
 ];
 

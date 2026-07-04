@@ -168,6 +168,9 @@ Examples:
 <node> r 0x606B 0 i32    # Velocity Demand Value
 ```
 
+> **Unit note (validated on this hardware):** `0x606C` returns values in ticks/min.
+> To convert to °/s: `deg_per_s = raw × TICS2DEG × 60`
+
 Velocity-mode-specific CiA 402 objects:
 
 ```text
@@ -341,6 +344,10 @@ Read actual active mode:
 <node> w 0x6086 0 i16 0                         # Motion Profile Type: 0 = trapezoidal
 <node> w 0x6086 0 i16 3                         # Motion Profile Type: 3 = jerk-limited
 ```
+
+> **Unit note (validated on this hardware):** `0x6081` expects ticks/min.
+> To convert from °/s: `ticks_per_min = round(deg_per_s / (TICS2DEG × 60))`
+> Example: 15 °/s → `round(15 / (6.3178e-04 × 60))` = 396
 
 ### Absolute move
 

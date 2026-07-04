@@ -54,3 +54,5 @@ A practical absolute move uses:
 - CAN speed: 1 Mbit/s using `init 0`.
 - Nodes: 1 and 2.
 - Position polling: `0x6064:00` as `i32`.
+- Velocity feedback (`0x606C`) is in **ticks/min** on this hardware. Display conversion: `deg/s = raw × TICS2DEG × 60`.
+- Profile velocity (`0x6081`) expects **ticks/min**. Write conversion: `ticks/min = round(deg/s / (TICS2DEG × 60))`. Example: 15 °/s → 396.

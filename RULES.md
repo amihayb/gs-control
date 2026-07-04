@@ -134,6 +134,19 @@ TICS2DEG  = 6.3178e-04   // encoder ticks → degrees (display only)
 MAX_TICKS = 20000         // hard travel limit ± on both axes
 ```
 
+Velocity feedback (`0x606C`) is in ticks/min on this hardware:
+
+```js
+deg_per_s = raw_606C × TICS2DEG × 60
+```
+
+Profile velocity (`0x6081`) expects ticks/min:
+
+```js
+ticks_per_min = round(deg_per_s / (TICS2DEG × 60))
+// Example: 15 °/s → round(15 / (6.3178e-04 × 60)) = 396
+```
+
 Current in Amps (from torque actual and rated current):
 
 ```js
