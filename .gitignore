@@ -2,7 +2,7 @@
 docs/**/*.pdf
 
 # Utility / dev scripts
-src/images/imgComp.py
+images/imgComp.py
 
 # Windows
 Thumbs.db
