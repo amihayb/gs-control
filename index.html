@@ -137,12 +137,22 @@
          title="Movement control interface" onclick="MovementControl(); return false;">
         Movement Control
       </a>
+      <a href="#" class="button" id="calibration-button"
+         title="Calibration panel" onclick="Calibration(); return false;">
+        Calibration
+      </a>
     </div>
   </div>
 
   <!-- Main content area -->
   <div id="main-content" style="margin-left:370px; margin-top:60px; padding:20px;">
     <h2>Log</h2>
+    <div id="console-area">
+      <input type="text" id="console-input"
+             placeholder="e.g. 1-321B:1:u16=1000  or  1-6064:0:i32"
+             autocomplete="off" spellcheck="false" />
+      <button id="console-send">Send</button>
+    </div>
     <pre id="log"></pre>
   </div>
 

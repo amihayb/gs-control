@@ -458,6 +458,94 @@ input[type="text"] {
   cursor: pointer;
 }
 
+/* ==================== Calibration Panel ==================== */
+
+.cal-axis-heading {
+  margin: 10px 14px 4px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cal-param-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+}
+
+.cal-param-label {
+  width: 64px;
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.cal-param-cur {
+  width: 68px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-family: monospace;
+  text-align: right;
+}
+
+.cal-param-input {
+  width: 80px;
+  padding: 5px 7px;
+  font-size: 13px;
+  font-family: monospace;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-input-bg);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.cal-param-input:focus {
+  border-color: var(--color-btn-action);
+}
+
+/* ==================== Console Input ==================== */
+
+#console-area {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+#console-input {
+  flex: 1;
+  font-family: monospace;
+  font-size: 13px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-input-bg);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+#console-input:focus {
+  border-color: var(--color-btn-action);
+}
+
+#console-send {
+  font-size: 13px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--color-btn-action);
+  color: var(--color-text-active);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#console-send:hover {
+  background-color: var(--color-btn-action-hover);
+}
+
 /* ==================== Log area ==================== */
 
 #log {

@@ -8,6 +8,9 @@ function MovementControl() {
   document.querySelectorAll('.button').forEach(btn => btn.classList.remove('active'));
   document.getElementById('movement-control-button').classList.add('active');
 
+  const calPanel = document.getElementById('calibration-panel');
+  if (calPanel) calPanel.remove();
+
   const existing = document.getElementById('movement-control-panel');
   if (existing) {
     existing.remove();
@@ -118,3 +121,83 @@ function closeMovementControl() {
 
 window.MovementControl      = MovementControl;
 window.closeMovementControl = closeMovementControl;
+
+// ==================== Calibration Panel ====================
+
+function _calParamRows(node) {
+  const params = [
+    { id: 'pos-kp', label: 'Pos Kp' },
+    { id: 'vel-kp', label: 'Vel Kp' },
+    { id: 'vel-ti', label: 'Vel Ti' },
+    { id: 'cur-kp', label: 'Cur Kp' },
+    { id: 'cur-ki', label: 'Cur Ki' },
+  ];
+  return params.map(p => `
+    <div class="cal-param-row">
+      <span class="cal-param-label">${p.label}</span>
+      <span class="cal-param-cur" id="cal-cur-${p.id}-${node}">---</span>
+      <input type="number" class="cal-param-input" id="cal-in-${p.id}-${node}"
+             placeholder="new value" min="0" />
+    </div>`).join('');
+}
+
+function Calibration() {
+  document.querySelectorAll('.button').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('calibration-button').classList.add('active');
+
+  const mcPanel = document.getElementById('movement-control-panel');
+  if (mcPanel) mcPanel.remove();
+
+  const existing = document.getElementById('calibration-panel');
+  if (existing) {
+    existing.remove();
+    document.getElementById('main-content').style.marginLeft = '370px';
+    document.querySelectorAll('.button').forEach(btn => btn.classList.remove('active'));
+    return;
+  }
+
+  const panel = document.createElement('div');
+  panel.id = 'calibration-panel';
+  panel.classList.add('movement-panel');
+  panel.innerHTML = `
+    <div class="panel-header">
+      <h1>Calibration</h1>
+      <button class="panel-close-btn" onclick="closeCalibration()">&#x00D7;</button>
+    </div>
+
+    <h3 class="cal-axis-heading">Axis 1</h3>
+    ${_calParamRows(1)}
+    <a href="#" class="button" style="display:block;" id="btn-apply-cal-1"
+       onclick="applyCalibration(1); return false;">Apply Axis 1</a>
+
+    <hr>
+
+    <h3 class="cal-axis-heading">Axis 2</h3>
+    ${_calParamRows(2)}
+    <a href="#" class="button" style="display:block;" id="btn-apply-cal-2"
+       onclick="applyCalibration(2); return false;">Apply Axis 2</a>
+
+    <hr>
+
+    <a href="#" class="button" style="display:block;" id="btn-save-cal-nvm"
+       onclick="saveCalibrationNVM(); return false;">Save Parameters</a>
+  `;
+
+  document.body.appendChild(panel);
+  document.getElementById('main-content').style.marginLeft = '720px';
+
+  if (typeof readCalibrationParams === 'function' && drive && drive.port) {
+    readCalibrationParams(1);
+    readCalibrationParams(2);
+  }
+}
+
+function closeCalibration() {
+  const panel = document.getElementById('calibration-panel');
+  if (panel) panel.remove();
+  document.getElementById('main-content').style.marginLeft = '370px';
+  document.querySelectorAll('.button').forEach(btn => btn.classList.remove('active'));
+}
+
+window.Calibration      = Calibration;
+window.closeCalibration = closeCalibration;

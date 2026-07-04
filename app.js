@@ -418,6 +418,249 @@ function abortProgram() {
   }
 }
 
+// ==================== Console Input ====================
+
+// Known SDO object types, keyed as "UPPERCASEHEX:subindex" (no 0x prefix).
+// If an object is not listed here, the user will be prompted to choose the type.
+const SDO_TYPES = {
+  // CiA 301 communication objects
+  '1000:0': 'u32',  // Device Type
+  '1001:0': 'u8',   // Error Register
+  '1003:0': 'u8',   // Number of Errors
+  '1010:6': 'u32',  // Save to NVM (store all)
+  '1018:1': 'u32',  // Vendor ID
+  '1018:2': 'u32',  // Product Code
+  '1018:3': 'u32',  // Revision Number
+  '1018:4': 'u32',  // Serial Number
+  // CiA 402 drive profile
+  '603F:0': 'u16',  // Error Code
+  '6040:0': 'u16',  // Controlword
+  '6041:0': 'u16',  // Statusword
+  '6043:0': 'i16',  // VL Velocity Demand
+  '6044:0': 'i16',  // VL Velocity Actual Value
+  '6060:0': 'i8',   // Modes of Operation
+  '6061:0': 'i8',   // Modes of Operation Display
+  '6062:0': 'i32',  // Position Demand Value
+  '6063:0': 'i32',  // Position Actual Internal Value
+  '6064:0': 'i32',  // Position Actual Value
+  '606B:0': 'i32',  // Velocity Demand Value
+  '606C:0': 'i32',  // Velocity Actual Value
+  '6073:0': 'u16',  // Max Current (thousandths of rated)
+  '6074:0': 'i16',  // Torque Demand
+  '6075:0': 'u32',  // Motor Rated Current (mA)
+  '6077:0': 'i16',  // Torque Actual Value
+  '6081:0': 'u32',  // Profile Velocity
+  '6083:0': 'u32',  // Profile Acceleration
+  '6084:0': 'u32',  // Profile Deceleration
+  '6085:0': 'u32',  // Quick Stop Deceleration
+  '6086:0': 'i16',  // Motion Profile Type
+  '607A:0': 'i32',  // Target Position
+  '6098:0': 'i8',   // Homing Method
+  '60F4:0': 'i32',  // Following Error Actual Value
+  '60FC:0': 'i32',  // Position Demand Internal Value
+  '60FD:0': 'u32',  // Digital Inputs
+  '60FE:1': 'u32',  // Digital Outputs (physical)
+  '60FE:2': 'u32',  // Digital Outputs (bit mask)
+  // Nanotec proprietary
+  '4040:0': 'vs',   // Drive Serial Number
+  '4041:0': 'u32',  // Device ID
+  '6503:0': 'vs',   // Drive Catalogue Number
+  // Nanotec controller gains
+  '321A:1': 'u32',  // Current Kp Iq
+  '321A:2': 'u32',  // Current Ki Iq
+  '321A:3': 'u32',  // Current Kp Id
+  '321A:4': 'u32',  // Current Ki Id
+  '321B:1': 'u32',  // Velocity Kp
+  '321B:2': 'u32',  // Velocity Ti
+  '321C:1': 'u32',  // Position Kp
+};
+
+const commandHistory = [];
+let historyIndex = -1;
+
+function parseConsoleCommand(input) {
+  const normalizeIndex = hex => /^0x/i.test(hex) ? hex : `0x${hex}`;
+  const lookupKey = (hex, sub) => hex.replace(/^0x/i, '').toUpperCase() + ':' + sub;
+
+  // Full format (type explicit): node-INDEX:sub:type=value  /  node-INDEX:sub:type
+  const wm = input.match(/^(\d+)-([0-9a-fA-F]+):(\d+):(\w+)=(.+)$/);
+  if (wm) return { op: 'write', node: parseInt(wm[1]), index: normalizeIndex(wm[2]),
+                   key: lookupKey(wm[2], wm[3]), sub: parseInt(wm[3]), type: wm[4], value: wm[5] };
+
+  const rm = input.match(/^(\d+)-([0-9a-fA-F]+):(\d+):(\w+)$/);
+  if (rm) return { op: 'read', node: parseInt(rm[1]), index: normalizeIndex(rm[2]),
+                   key: lookupKey(rm[2], rm[3]), sub: parseInt(rm[3]), type: rm[4] };
+
+  // Short format (type omitted — looked up or prompted): node-INDEX:sub=value  /  node-INDEX:sub
+  const sw = input.match(/^(\d+)-([0-9a-fA-F]+):(\d+)=(.+)$/);
+  if (sw) return { op: 'write', node: parseInt(sw[1]), index: normalizeIndex(sw[2]),
+                   key: lookupKey(sw[2], sw[3]), sub: parseInt(sw[3]), type: null, value: sw[4] };
+
+  const sr = input.match(/^(\d+)-([0-9a-fA-F]+):(\d+)$/);
+  if (sr) return { op: 'read', node: parseInt(sr[1]), index: normalizeIndex(sr[2]),
+                   key: lookupKey(sr[2], sr[3]), sub: parseInt(sr[3]), type: null };
+
+  return null;
+}
+
+async function handleConsoleCommand(input) {
+  const cmd = parseConsoleCommand(input.trim());
+  if (!cmd) {
+    log(`Console: invalid format.`);
+    log(`  Write: 1-321B:1=1000          (type auto-detected or prompted)`);
+    log(`  Write: 1-321B:1:u16=1000      (type explicit)`);
+    log(`  Read:  1-6064:0               (type auto-detected or prompted)`);
+    log(`  Read:  1-6064:0:i32           (type explicit)`);
+    return;
+  }
+  if (!drive || !drive.port) {
+    log('Console: not connected.');
+    return;
+  }
+
+  let type = cmd.type || SDO_TYPES[cmd.key];
+
+  if (!type) {
+    const result = await Swal.fire({
+      title: `Unknown object ${cmd.key}`,
+      text: 'Select the data type to use:',
+      input: 'select',
+      inputOptions: { i8: 'i8  (signed 8-bit)', i16: 'i16  (signed 16-bit)', i32: 'i32  (signed 32-bit)',
+                      u8:  'u8  (unsigned 8-bit)', u16: 'u16  (unsigned 16-bit)', u32: 'u32  (unsigned 32-bit)' },
+      inputPlaceholder: 'Select type…',
+      showCancelButton: true,
+      confirmButtonText: 'Send',
+    });
+    if (!result.isConfirmed || !result.value) return;
+    type = result.value;
+    SDO_TYPES[cmd.key] = type;  // remember for the rest of this session
+    log(`Console: remembered ${cmd.key} → ${type} for this session`);
+  }
+
+  try {
+    if (cmd.op === 'write') {
+      await drive.writeObj(cmd.node, cmd.index, cmd.sub, type, cmd.value);
+    } else {
+      await drive.readObj(cmd.node, cmd.index, cmd.sub, type);
+    }
+  } catch (e) {
+    log(`Console error: ${e.message || e}`);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  const input = $('console-input');
+  const btn   = $('console-send');
+  if (!input || !btn) return;
+
+  async function submit() {
+    const val = input.value.trim();
+    if (!val) return;
+    if (commandHistory[0] !== val) commandHistory.unshift(val);
+    historyIndex = -1;
+    input.value = '';
+    await handleConsoleCommand(val);
+  }
+
+  btn.addEventListener('click', submit);
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      submit();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (historyIndex < commandHistory.length - 1) {
+        historyIndex++;
+        input.value = commandHistory[historyIndex];
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIndex > 0) {
+        historyIndex--;
+        input.value = commandHistory[historyIndex];
+      } else {
+        historyIndex = -1;
+        input.value = '';
+      }
+    }
+  });
+});
+
+// ==================== Calibration ====================
+
+const CAL_PARAMS = [
+  { id: 'pos-kp', label: 'Pos Kp',  reads: [['0x321C', '1']], writes: [['0x321C', '1']] },
+  { id: 'vel-kp', label: 'Vel Kp',  reads: [['0x321B', '1']], writes: [['0x321B', '1']] },
+  { id: 'vel-ti', label: 'Vel Ti',  reads: [['0x321B', '2']], writes: [['0x321B', '2']] },
+  { id: 'cur-kp', label: 'Cur Kp',  reads: [['0x321A', '1']], writes: [['0x321A', '1'], ['0x321A', '3']] },
+  { id: 'cur-ki', label: 'Cur Ki',  reads: [['0x321A', '2']], writes: [['0x321A', '2'], ['0x321A', '4']] },
+];
+
+async function readCalibrationParams(node) {
+  if (!drive || !drive.port) return;
+  for (const p of CAL_PARAMS) {
+    const el = document.getElementById(`cal-cur-${p.id}-${node}`);
+    if (!el) continue;
+    try {
+      const raw = await drive.readObj(node, p.reads[0][0], parseInt(p.reads[0][1]), 'u32');
+      // readObj returns the full "cmd -> response" string; extract the numeric part
+      const match = String(raw).match(/-?\d+/g);
+      el.textContent = match ? match[match.length - 1] : raw;
+    } catch (e) {
+      el.textContent = '---';
+    }
+  }
+}
+
+async function applyCalibration(node) {
+  if (!drive || !drive.port) { log('Calibration: not connected.'); return; }
+  log(`=== Apply Calibration Axis ${node} ===`);
+  for (const p of CAL_PARAMS) {
+    const inputEl = document.getElementById(`cal-in-${p.id}-${node}`);
+    if (!inputEl || inputEl.value.trim() === '') continue;
+    const value = inputEl.value.trim();
+    try {
+      for (const [index, sub] of p.writes) {
+        await drive.writeObj(node, index, parseInt(sub), 'u32', value);
+      }
+      // Refresh displayed current value
+      const curEl = document.getElementById(`cal-cur-${p.id}-${node}`);
+      if (curEl) curEl.textContent = value;
+      inputEl.value = '';
+    } catch (e) {
+      log(`Calibration: error writing ${p.label} to node ${node}: ${e.message || e}`);
+    }
+  }
+  log(`=== Apply Calibration Axis ${node} done ===`);
+}
+
+async function saveCalibrationNVM() {
+  if (!drive || !drive.port) { log('Calibration: not connected.'); return; }
+  const result = await Swal.fire({
+    title:             'Save Parameters?',
+    text:              'Save all calibration parameters to non-volatile memory for both axes?',
+    icon:              'question',
+    showCancelButton:  true,
+    confirmButtonText: 'Save',
+    cancelButtonText:  'Cancel',
+  });
+  if (!result.isConfirmed) { log('Save parameters cancelled.'); return; }
+  log('Saving calibration parameters to NVM…');
+  for (const node of NODES) {
+    try {
+      await drive.saveParameters(node, 6);
+      log(`  Node ${node}: saved.`);
+    } catch (e) {
+      log(`  Node ${node}: save failed — ${e.message || e}`);
+    }
+  }
+  log('Save parameters done.');
+}
+
+window.readCalibrationParams = readCalibrationParams;
+window.applyCalibration      = applyCalibration;
+window.saveCalibrationNVM    = saveCalibrationNVM;
+
 window.goToPosition      = goToPosition;
 window.motorsOn          = motorsOn;
 window.motorsOff         = motorsOff;
