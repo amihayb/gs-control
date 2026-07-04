@@ -211,6 +211,17 @@ function jog(axis, deltaDeg) {
   goToPosition();
 }
 
+// Diagonal jog: add delta1 to Axis 1 and delta2 to Axis 2, clamp both, then move
+function jogDiag(delta1, delta2) {
+  const input1 = $('target1');
+  const input2 = $('target2');
+  if (!input1 || !input2) return;
+  const maxDeg = MAX_TICKS * TICS2DEG;
+  input1.value = Math.max(-maxDeg, Math.min(maxDeg, (Number(input1.value) || 0) + delta1)).toFixed(3);
+  input2.value = Math.max(-maxDeg, Math.min(maxDeg, (Number(input2.value) || 0) + delta2)).toFixed(3);
+  goToPosition();
+}
+
 // Home: send both axes to 0°
 function jogHome() {
   const t1 = $('target1'); if (t1) t1.value = '0';
@@ -648,7 +659,7 @@ async function saveCalibrationNVM() {
   log('Saving calibration parameters to NVM…');
   for (const node of NODES) {
     try {
-      await drive.saveParameters(node, 6);
+      await drive.saveParameters(node, 3);   // Save to application parameters
       log(`  Node ${node}: saved.`);
     } catch (e) {
       log(`  Node ${node}: save failed — ${e.message || e}`);
@@ -668,6 +679,7 @@ window.toggleTheme       = toggleTheme;
 window.about             = about;
 window.emergencyStop     = emergencyStop;
 window.jog               = jog;
+window.jogDiag           = jogDiag;
 window.jogHome           = jogHome;
 window.setHomeForAllAxes = setHomeForAllAxes;
 window.runProgram        = runProgram;

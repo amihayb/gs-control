@@ -429,12 +429,14 @@ input[type="text"] {
   background-color: var(--color-btn-action);
 }
 
-.jog-small { font-size: 13px; }
+.jog-small { font-size: 13px; opacity: 0.5; }
+.jog-small:hover { opacity: 1; }
 .jog-big   { font-size: 18px; }
 
 .jog-home {
   background-color: var(--color-btn-active);
-  font-size: 16px;
+  font-size: 32px;
+  color: #ed962d;
 }
 
 .jog-home:hover {
