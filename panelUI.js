@@ -89,17 +89,17 @@ function MovementControl() {
     <hr>
 
     <div style="margin-top:16px;">
+      ${USER_PROGRAMS.map((p, i) => {
+        const id = `btn-prog-${i + 1}`;
+        return `<a href="#" class="button" style="display:block;"
+         id="${id}" onclick="runProgram(USER_PROGRAMS[${i}].steps, '${p.label}', '${id}'); return false;">
+        ${p.label}
+      </a>`;
+      }).join('')}
+      <hr>
       <a href="#" class="button" style="display:block;"
-         id="btn-prog-1" onclick="runProgram(PROG1, 'Program 1', 'btn-prog-1'); return false;">
-        Program 1
-      </a>
-      <a href="#" class="button" style="display:block;"
-         id="btn-prog-2" onclick="runProgram(PROG2, 'Program 2', 'btn-prog-2'); return false;">
-        Program 2
-      </a>
-      <a href="#" class="button" style="display:block;"
-         id="btn-prog-3" onclick="runProgram(PROG3, 'Program 3', 'btn-prog-3'); return false;">
-        Program 3
+         id="btn-random" onclick="runRandom('btn-random'); return false;">
+        Random
       </a>
     </div>
 

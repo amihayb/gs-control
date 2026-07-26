@@ -434,6 +434,46 @@ function abortProgram() {
   }
 }
 
+async function runRandom(btnId) {
+  if (!drive) { log("Not connected."); return; }
+
+  if (_progRunning) {
+    log('Switching to Random — aborting current program');
+    _progRunning = false;
+    await _progDone;
+  }
+
+  _progRunning = true;
+  const btn = btnId ? document.getElementById(btnId) : null;
+  if (btn) btn.classList.add('in-progress');
+
+  log('=== Random start (±10° every 2s) ===');
+
+  _progDone = (async () => {
+    try {
+      await ensureMotorsOn();
+      while (_progRunning) {
+        const ax1 = +(Math.random() * 20 - 10).toFixed(1);
+        const ax2 = +(Math.random() * 20 - 10).toFixed(1);
+        const t1 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax1 / TICS2DEG)));
+        const t2 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax2 / TICS2DEG)));
+        log(`  Random: Ax1=${ax1}° Ax2=${ax2}°`);
+        await drive.moveAbs(1, t1);
+        await drive.moveAbs(2, t2);
+        await new Promise(r => setTimeout(r, 2000));
+      }
+      log('=== Random stopped ===');
+    } catch (e) {
+      log(`Random error: ${e.message || e}`);
+    } finally {
+      _progRunning = false;
+      if (btn) btn.classList.remove('in-progress');
+    }
+  })();
+
+  await _progDone;
+}
+
 // ==================== Console Input ====================
 
 // Known SDO object types, keyed as "UPPERCASEHEX:subindex" (no 0x prefix).
@@ -689,6 +729,7 @@ window.jogDiag           = jogDiag;
 window.jogHome           = jogHome;
 window.setHomeForAllAxes = setHomeForAllAxes;
 window.runProgram        = runProgram;
+window.runRandom         = runRandom;
 
 // Initialise UI state
 setConnectedUi(false);
