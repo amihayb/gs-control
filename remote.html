@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GS Remote</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="remote-manifest.json">
+  <meta name="theme-color" content="#1a2535">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GS Remote">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/logo-180x180.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="images/logo-512x512.png">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="vendor/font-awesome.min.css">
+
+  <!-- Desktop stylesheet — provides all CSS variables and dark theme -->
+  <link rel="stylesheet" href="StyleSheet.css">
+
+  <!-- Apply saved theme before render to avoid flash -->
+  <script>
+    (function () {
+      var theme = localStorage.getItem('gs-theme') || 'dark';
+      if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
+
+  <style>
+    /* ── Reset desktop layout ─────────────────────────────────────── */
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* ── Top bar ──────────────────────────────────────────────────── */
+    .remote-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background-color: var(--color-nav-bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .remote-header .logo-gevasol { height: 38px; }
+    .remote-header .logo-blau    { height: 32px; }
+
+    #theme-toggle-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      padding: 8px 12px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── Page content ─────────────────────────────────────────────── */
+    .remote-content {
+      padding: 8px 12px 40px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--color-text-muted);
+      margin: 8px 0 4px 2px;
+    }
+
+    .section-label.jog-label {
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+
+    /* ── Jog grid ─────────────────────────────────────────────────── */
+    .jog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      max-width: 300px;
+      margin: 0 auto 6px;
+    }
+
+    .jog-btn-r {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 76px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      background-color: var(--color-btn-active);
+      color: var(--color-text-active);
+      font-size: 26px;
+      transition: background-color 0.12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .jog-btn-r:active {
+      background-color: var(--color-btn-action);
+      transform: scale(0.94);
+    }
+
+    .jog-home-r {
+      font-size: 30px;
+      color: #ed962d;
+    }
+
+    .jog-placeholder { /* empty grid cell — no styling needed */ }
+
+    /* ── Control row ──────────────────────────────────────────────── */
+    .control-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .ctrl-btn {
+      padding: 20px 8px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      color: #fff;
+      letter-spacing: 0.02em;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .ctrl-btn:active { transform: scale(0.95); }
+
+    .pause-btn {
+      background-color: var(--color-btn-action);
+    }
+    .pause-btn:active { background-color: var(--color-btn-action-hover); }
+
+    .stop-btn {
+      background-color: var(--color-btn-danger);
+    }
+    .stop-btn:active { background-color: var(--color-btn-danger-hover); }
+
+    /* ── Program grid ─────────────────────────────────────────────── */
+    .prog-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .prog-btn {
+      padding: 22px 8px;
+      font-size: 18px;
+      font-weight: 500;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      background-color: var(--color-btn-default);
+      color: var(--color-text-primary);
+      text-align: center;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .prog-btn:active {
+      background-color: var(--color-btn-hover-deep);
+      color: var(--color-text-active);
+      transform: scale(0.96);
+    }
+
+    .random-btn {
+      background-color: var(--color-btn-active);
+      color: var(--color-text-active);
+    }
+
+    /* Odd last button spans both columns */
+    .prog-btn:last-child:nth-child(odd) {
+      grid-column: span 2;
+    }
+
+    /* Brief flash on tap to confirm send */
+    @keyframes tap-flash {
+      0%   { opacity: 1; }
+      35%  { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+    .flash { animation: tap-flash 0.28s ease; }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────────────────── -->
+  <div class="remote-header">
+    <img src="images/gevasol-logo.svg" alt="Gevasol" class="logo-gevasol">
+    <button id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">
+      <i class="fa fa-moon-o" id="theme-icon"></i>
+    </button>
+    <img src="images/logo-title.svg" alt="Blau Robotics" class="logo-blau">
+  </div>
+
+  <!-- ── Page body ───────────────────────────────────────────────────── -->
+  <div class="remote-content">
+
+    <!-- Jog -->
+    <div class="section-label jog-label">Jog ±5°</div>
+    <div class="jog-grid">
+      <div class="jog-placeholder"></div>
+      <button class="jog-btn-r" onclick="send('jog',{axis:1,delta:5})"  title="+5° Axis 1"><i class="fa fa-arrow-up"></i></button>
+      <div class="jog-placeholder"></div>
+
+      <button class="jog-btn-r" onclick="send('jog',{axis:2,delta:5})"  title="+5° Axis 2"><i class="fa fa-arrow-left"></i></button>
+      <button class="jog-btn-r jog-home-r" onclick="send('jogHome')"    title="Home (0°, 0°)"><i class="fa fa-home"></i></button>
+      <button class="jog-btn-r" onclick="send('jog',{axis:2,delta:-5})" title="-5° Axis 2"><i class="fa fa-arrow-right"></i></button>
+
+      <div class="jog-placeholder"></div>
+      <button class="jog-btn-r" onclick="send('jog',{axis:1,delta:-5})" title="-5° Axis 1"><i class="fa fa-arrow-down"></i></button>
+      <div class="jog-placeholder"></div>
+    </div>
+
+    <!-- Control -->
+    <div class="section-label">Control</div>
+    <div class="control-row">
+      <button class="ctrl-btn pause-btn" onclick="send('pauseResume')">
+        <i class="fa fa-pause"></i>&nbsp; Pause / Resume
+      </button>
+      <button class="ctrl-btn stop-btn" onclick="send('stop')">
+        <i class="fa fa-stop"></i>&nbsp; Stop
+      </button>
+    </div>
+
+    <!-- Programs -->
+    <div class="section-label">Programs</div>
+    <div class="prog-grid" id="prog-grid"></div>
+
+  </div>
+
+  <!-- ── Scripts ─────────────────────────────────────────────────────── -->
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-database-compat.js"></script>
+  <script src="UserPrograms.js"></script>
+
+  <script>
+    // ── Theme ───────────────────────────────────────────────────────────
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('theme-icon');
+      if (icon) icon.className = theme === 'light' ? 'fa fa-sun-o' : 'fa fa-moon-o';
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('gs-theme', 'light');
+        updateThemeIcon('light');
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('gs-theme', 'dark');
+        updateThemeIcon('dark');
+      }
+    }
+
+    updateThemeIcon(localStorage.getItem('gs-theme') || 'dark');
+
+    // ── Firebase ────────────────────────────────────────────────────────
+    firebase.initializeApp({
+      apiKey:            "AIzaSyA53G0xpcFD8QFyhkwsoVdVO4Jqk28wVs4",
+      authDomain:        "gs-control-6324d.firebaseapp.com",
+      databaseURL:       "https://gs-control-6324d-default-rtdb.firebaseio.com",
+      projectId:         "gs-control-6324d",
+      storageBucket:     "gs-control-6324d.firebasestorage.app",
+      messagingSenderId: "697981638689",
+      appId:             "1:697981638689:web:0951dbc21e878d9bd2eb60"
+    });
+
+    const _db = firebase.database();
+
+    function send(type, extra) {
+      _db.ref("gs-control/command").set(
+        Object.assign({ type, ts: Date.now() }, extra || {})
+      );
+    }
+
+    // ── Build program buttons ───────────────────────────────────────────
+    const grid = document.getElementById('prog-grid');
+
+    USER_PROGRAMS.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'prog-btn';
+      btn.textContent = p.label;
+      btn.addEventListener('click', () => {
+        send('runProgram', { program: p.label });
+        flash(btn);
+      });
+      grid.appendChild(btn);
+    });
+
+    const rndBtn = document.createElement('button');
+    rndBtn.className = 'prog-btn random-btn';
+    rndBtn.innerHTML = '<i class="fa fa-random"></i>&nbsp; Random';
+    rndBtn.addEventListener('click', () => {
+      const p = USER_PROGRAMS[Math.floor(Math.random() * USER_PROGRAMS.length)];
+      send('runProgram', { program: p.label });
+      flash(rndBtn);
+    });
+    grid.appendChild(rndBtn);
+
+    function flash(el) {
+      el.classList.add('flash');
+      el.addEventListener('animationend', () => el.classList.remove('flash'), { once: true });
+    }
+  </script>
+
+</body>
+</html>

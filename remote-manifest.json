@@ -1,0 +1,21 @@
+{
+  "name": "GS Remote",
+  "short_name": "GS Remote",
+  "description": "Mobile remote control for Gevasol Stabilit — sends commands to the desktop app via Firebase.",
+  "start_url": "remote.html",
+  "display": "standalone",
+  "background_color": "#1a2535",
+  "theme_color": "#1a2535",
+  "icons": [
+    {
+      "src": "images/logo-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/logo-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

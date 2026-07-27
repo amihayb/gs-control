@@ -29,3 +29,34 @@ Travel is clamped to ±20 000 ticks on both axes.
 | `StyleSheet.css` | Visual style |
 
 Read `RULES.md` before changing motor-control code.
+
+## Firebase remote control
+
+The desktop app listens for commands sent by the mobile PWA via Firebase Realtime Database.
+
+**Project:** `gs-control-6324d`  
+**Database URL:** `https://gs-control-6324d-default-rtdb.firebaseio.com`  
+**Firebase console:** [console.firebase.google.com](https://console.firebase.google.com/project/gs-control-6324d)
+
+### How it works
+
+- The desktop app connects to Firebase on load and logs `"Firebase remote listener ready."` in the log panel.
+- The mobile app writes a command object to `gs-control/command` in the database.
+- The desktop app receives it in under a second and calls the matching function.
+- Commands with a `ts` (timestamp) older than the app's start time are ignored, so stale database values don't trigger on reload.
+
+### Command format written by the mobile app
+
+```json
+{ "type": "runProgram", "program": "Ankle", "ts": 1722031234567 }
+{ "type": "stop",        "ts": 1722031234567 }
+{ "type": "emergencyStop", "ts": 1722031234567 }
+```
+
+`program` must match a label in `USER_PROGRAMS` (e.g. `"Ankle"`, `"Squat"`, `"Hip Gap"`).  
+`ts` is `Date.now()` — it must change on every press so Firebase fires the listener.
+
+### Database security rules
+
+Currently set to **test mode** (open read/write for 30 days from project creation).  
+Before deploying for real use, change the rules in the Firebase console → Realtime Database → Rules to restrict write access (e.g. require authentication or a secret key).

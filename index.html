@@ -48,6 +48,9 @@
     <button id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">
       <i class="fa fa-moon-o" id="theme-icon"></i>
     </button>
+    <button id="log-toggle-btn" onclick="toggleLog()" title="Show / hide log">
+      <i class="fa fa-terminal"></i>
+    </button>
     <a onclick="about()" title="About"><i class="fa fa-info-circle"></i></a>
     <img src="images/logo-title.svg" alt="Blau Robotics" id="LogoBlau" height="36">
   </div>
@@ -146,15 +149,39 @@
 
   <!-- Main content area -->
   <div id="main-content" style="margin-left:370px; margin-top:60px; padding:20px;">
-    <h2>Log</h2>
-    <div id="console-area">
-      <input type="text" id="console-input"
-             placeholder="e.g. 1-321B:1:u16=1000  or  1-6064:0:i32"
-             autocomplete="off" spellcheck="false" />
-      <button id="console-send">Send</button>
+
+    <!-- Step banner — shows active program name and current step info -->
+    <div id="step-banner">
+      <div id="step-banner-program">Ready</div>
+      <div id="step-banner-info"></div>
+      <div id="step-banner-step"></div>
     </div>
-    <pre id="log"></pre>
+
+    <!-- Pause / Resume button — shown only while a program is running -->
+    <div id="pause-btn-wrap">
+      <button id="pause-btn" onclick="togglePause()">
+        <i class="fa fa-pause" id="pause-icon"></i>
+        <span id="pause-label">Pause</span>
+      </button>
+    </div>
+
+    <!-- Log section (toggle-able) -->
+    <div id="log-section">
+      <h2>Log</h2>
+      <div id="console-area">
+        <input type="text" id="console-input"
+               placeholder="e.g. 1-321B:1:u16=1000  or  1-6064:0:i32"
+               autocomplete="off" spellcheck="false" />
+        <button id="console-send">Send</button>
+      </div>
+      <pre id="log"></pre>
+    </div>
+
   </div>
+
+  <!-- Firebase compat SDK (required for remote mobile commands) -->
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-database-compat.js"></script>
 
   <script src="nanotec-canopen.js"></script>
   <script src="panelUI.js"></script>

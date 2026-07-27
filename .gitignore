@@ -1,6 +1,10 @@
 # PDF manuals (large files, not tracked in Git)
 docs/**/*.pdf
 
+# Data files
+*.xlsx
+*.csv
+
 # Utility / dev scripts
 images/imgComp.py
 

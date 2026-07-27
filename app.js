@@ -18,6 +18,26 @@ function log(message) {
   $("log").scrollTop = $("log").scrollHeight;
 }
 
+function toggleLog() {
+  const section = $('log-section');
+  const btn     = $('log-toggle-btn');
+  if (!section) return;
+  const hiding = section.style.display !== 'none';
+  section.style.display = hiding ? 'none' : '';
+  if (btn) btn.classList.toggle('log-hidden', hiding);
+}
+
+function setStepBanner(programName, info, step) {
+  const banner  = $('step-banner');
+  const progEl  = $('step-banner-program');
+  const infoEl  = $('step-banner-info');
+  const stepEl  = $('step-banner-step');
+  if (progEl) progEl.textContent = programName || 'Ready';
+  if (infoEl) infoEl.textContent = info        || '';
+  if (stepEl) stepEl.textContent = step        || '';
+  if (banner) banner.classList.toggle('running', !!(programName && programName !== 'Ready'));
+}
+
 // ==================== Theme ====================
 
 function updateThemeIcon(theme) {
@@ -244,7 +264,7 @@ async function goToPosition() {
     log("Not connected.");
     return;
   }
-  abortProgram();
+  if (!_progPaused) abortProgram();
   try {
     await ensureMotorsOn();
     const deg1 = Number($("target1").value);
@@ -365,7 +385,30 @@ async function setHomeForAllAxes() {
 // ==================== Programs ====================
 
 let _progRunning = false;
+let _progPaused  = false;
 let _progDone    = Promise.resolve();   // resolves when current program fully exits
+
+function _setPauseBtnVisible(visible) {
+  const wrap = $('pause-btn-wrap');
+  if (wrap) wrap.style.display = visible ? 'block' : 'none';
+}
+
+function _setPauseBtnState(paused) {
+  const btn   = $('pause-btn');
+  const icon  = $('pause-icon');
+  const label = $('pause-label');
+  if (!btn) return;
+  btn.classList.toggle('paused', paused);
+  if (icon)  icon.className  = paused ? 'fa fa-play'  : 'fa fa-pause';
+  if (label) label.textContent = paused ? 'Resume'    : 'Pause';
+}
+
+function togglePause() {
+  if (!_progRunning) return;
+  _progPaused = !_progPaused;
+  _setPauseBtnState(_progPaused);
+  log(_progPaused ? '⏸ Program paused.' : '▶ Program resumed.');
+}
 
 async function runProgram(steps, label, btnId) {
   if (!drive) { log("Not connected."); return; }
@@ -378,6 +421,7 @@ async function runProgram(steps, label, btnId) {
   }
 
   _progRunning = true;
+  _progPaused  = false;
   const btn = btnId ? document.getElementById(btnId) : null;
 
   if (btn) {
@@ -385,37 +429,91 @@ async function runProgram(steps, label, btnId) {
     btn.style.setProperty('--progress', '0%');
   }
 
+  _setPauseBtnVisible(true);
+  _setPauseBtnState(false);
+
   const totalMs   = steps.reduce((sum, s) => sum + s.waitMs, 0);
+  let   pausedAt  = 0;   // tracks accumulated pause time so progress bar doesn't drift
   const startTime = Date.now();
   const progressInterval = setInterval(() => {
-    const pct = Math.min(99, Math.round(((Date.now() - startTime) / totalMs) * 100));
+    if (_progPaused) return;
+    const elapsed = Date.now() - startTime - pausedAt;
+    const pct = Math.min(99, Math.round((elapsed / totalMs) * 100));
     if (btn) btn.style.setProperty('--progress', `${pct}%`);
   }, 80);
 
   log(`=== ${label} start (${steps.length} steps, ~${(totalMs / 1000).toFixed(1)}s) ===`);
+  setStepBanner(label, 'Starting…');
 
   // Store the promise so switchers can await cleanup
   _progDone = (async () => {
     try {
       await ensureMotorsOn();
       for (let i = 0; i < steps.length; i++) {
-        if (!_progRunning) { log(`${label} aborted at step ${i + 1}`); return; }
+        if (!_progRunning) {
+          log(`${label} aborted at step ${i + 1}`);
+          setStepBanner('Ready', '');
+          return;
+        }
 
-        const { ax1, ax2, waitMs } = steps[i];
-        const t1 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax1 / TICS2DEG)));
-        const t2 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax2 / TICS2DEG)));
+        const { ax1, ax2, waitMs, vel, info, pause } = steps[i];
+        const isPauseLine = pause && ax1 == null && ax2 == null;
 
-        log(`  Step ${i + 1}/${steps.length}: Ax1=${ax1}° Ax2=${ax2}° wait=${waitMs}ms`);
-        await drive.moveAbs(1, t1);
-        await drive.moveAbs(2, t2);
-        await new Promise(r => setTimeout(r, waitMs));
+        const infoStr = info ? ` — ${info}` : '';
+        setStepBanner(label, info || '', `Step ${i + 1} / ${steps.length}`);
+
+        if (isPauseLine) {
+          // Pure pause line — no motor commands, just hold
+          log(`  Step ${i + 1}/${steps.length}: ⏸ Pause${infoStr}`);
+        } else {
+          const t1 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax1 / TICS2DEG)));
+          const t2 = Math.round(Math.max(-MAX_TICKS, Math.min(MAX_TICKS, ax2 / TICS2DEG)));
+
+          const stepVel = Math.max(2, Math.min(20, vel != null ? vel : 15));
+          const stepVelTicks = Math.round(stepVel / (TICS2DEG * 60));
+          for (const node of NODES) await drive.writeObj(node, "0x6081", 0, "u32", stepVelTicks);
+
+          log(`  Step ${i + 1}/${steps.length}: Ax1=${ax1}° Ax2=${ax2}° vel=${stepVel}°/s wait=${waitMs}ms${infoStr}`);
+          await drive.moveAbs(1, t1);
+          await drive.moveAbs(2, t2);
+        }
+
+        // Auto-pause (pure pause line, or a move step with pause:true)
+        if (pause && !_progPaused) {
+          _progPaused = true;
+          _setPauseBtnState(true);
+          log(`⏸  Auto-pause at step ${i + 1} — press Resume to continue.`);
+        }
+
+        // Wait waitMs in small slices so abort and pause both respond quickly
+        const stepWait = waitMs ?? 0;
+        const end = Date.now() + stepWait;
+        while (Date.now() < end && _progRunning) {
+          await new Promise(r => setTimeout(r, Math.min(50, end - Date.now())));
+        }
+
+        // If paused, hold here and accumulate pause time for the progress bar
+        if (_progPaused) {
+          const pauseStart = Date.now();
+          while (_progPaused && _progRunning) {
+            await new Promise(r => setTimeout(r, 80));
+          }
+          pausedAt += Date.now() - pauseStart;
+        }
       }
-      if (_progRunning) log(`=== ${label} complete ===`);
+      if (_progRunning) {
+        log(`=== ${label} complete ===`);
+        setStepBanner('Ready', `${label} complete`);
+      }
     } catch (e) {
       log(`${label} error: ${e.message || e}`);
+      setStepBanner('Ready', '');
     } finally {
       clearInterval(progressInterval);
       _progRunning = false;
+      _progPaused  = false;
+      _setPauseBtnVisible(false);
+      _setPauseBtnState(false);
       if (btn) {
         btn.style.setProperty('--progress', '100%');
         await new Promise(r => setTimeout(r, 300));
@@ -730,7 +828,58 @@ window.jogHome           = jogHome;
 window.setHomeForAllAxes = setHomeForAllAxes;
 window.runProgram        = runProgram;
 window.runRandom         = runRandom;
+window.togglePause       = togglePause;
 
 // Initialise UI state
 setConnectedUi(false);
 MovementControl();
+
+// ==================== Firebase remote command listener ====================
+// Mobile PWA sends commands here; desktop app executes them.
+// Only commands with ts > _appStartTs are processed — stale DB values are ignored on load.
+
+const _FB_CONFIG = {
+  apiKey:            "AIzaSyA53G0xpcFD8QFyhkwsoVdVO4Jqk28wVs4",
+  authDomain:        "gs-control-6324d.firebaseapp.com",
+  databaseURL:       "https://gs-control-6324d-default-rtdb.firebaseio.com",
+  projectId:         "gs-control-6324d",
+  storageBucket:     "gs-control-6324d.firebasestorage.app",
+  messagingSenderId: "697981638689",
+  appId:             "1:697981638689:web:0951dbc21e878d9bd2eb60"
+};
+
+const _appStartTs = Date.now();
+
+(function initFirebaseListener() {
+  try {
+    firebase.initializeApp(_FB_CONFIG);
+    const db = firebase.database();
+    db.ref("gs-control/command").on("value", snap => {
+      const cmd = snap.val();
+      if (!cmd || !cmd.ts || cmd.ts <= _appStartTs) return;
+
+      log(`[Remote] ${cmd.type}${cmd.program ? ': ' + cmd.program : ''}`);
+
+      if (cmd.type === "runProgram") {
+        const prog = USER_PROGRAMS.find(p => p.label === cmd.program);
+        if (prog) runProgram(prog.steps, prog.label);
+        else log(`[Remote] Unknown program: ${cmd.program}`);
+      } else if (cmd.type === "stop") {
+        abortProgram();
+      } else if (cmd.type === "emergencyStop") {
+        emergencyStop();
+      } else if (cmd.type === "jog") {
+        jog(cmd.axis, cmd.delta);
+      } else if (cmd.type === "jogHome") {
+        jogHome();
+      } else if (cmd.type === "pauseResume") {
+        togglePause();
+      } else {
+        log(`[Remote] Unknown command type: ${cmd.type}`);
+      }
+    });
+    log("Firebase remote listener ready.");
+  } catch (e) {
+    log(`Firebase init failed: ${e.message || e}`);
+  }
+})();

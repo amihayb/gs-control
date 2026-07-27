@@ -54,36 +54,37 @@ function MovementControl() {
     </a>
 
     <!-- Jog grid: 5×5, big arrows outer, small arrows inner, home center, diagonals at corners -->
+    <!-- Up/Down = Axis 1 · Left/Right = Axis 2 -->
     <div style="display:grid; grid-template-columns:repeat(5,38px); grid-template-rows:repeat(5,38px); gap:4px; margin:12px auto; width:fit-content;">
-      <button class="jog-btn jog-big"   onclick="jogDiag(-5, 5)"  title="-5° Ax1 / +5° Ax2"><i class="fa fa-arrow-up"    style="display:inline-block;transform:rotate(-45deg)"></i></button>
+      <button class="jog-btn jog-big"   onclick="jogDiag( 5, 5)"  title="+5° Ax1 / +5° Ax2"><i class="fa fa-arrow-up"    style="display:inline-block;transform:rotate(-45deg)"></i></button>
       <span></span>
-      <button class="jog-btn jog-big"   onclick="jog(2, 5)"       title="+5° Axis 2"><i class="fa fa-arrow-up"></i></button>
+      <button class="jog-btn jog-big"   onclick="jog(1, 5)"       title="+5° Axis 1"><i class="fa fa-arrow-up"></i></button>
       <span></span>
-      <button class="jog-btn jog-big"   onclick="jogDiag( 5, 5)"  title="+5° Ax1 / +5° Ax2"><i class="fa fa-arrow-up"    style="display:inline-block;transform:rotate(45deg)"></i></button>
+      <button class="jog-btn jog-big"   onclick="jogDiag( 5,-5)"  title="+5° Ax1 / -5° Ax2"><i class="fa fa-arrow-up"    style="display:inline-block;transform:rotate(45deg)"></i></button>
 
       <span></span>
-      <button class="jog-btn jog-small" onclick="jogDiag(-1, 1)"  title="-1° Ax1 / +1° Ax2"><i class="fa fa-arrow-up"    style="display:inline-block;transform:rotate(-45deg)"></i></button>
-      <button class="jog-btn jog-small" onclick="jog(2, 1)"       title="+1° Axis 2"><i class="fa fa-arrow-up"></i></button>
-      <button class="jog-btn jog-small" onclick="jogDiag( 1, 1)"  title="+1° Ax1 / +1° Ax2"><i class="fa fa-arrow-up"    style="display:inline-block;transform:rotate(45deg)"></i></button>
+      <button class="jog-btn jog-small" onclick="jogDiag( 1, 1)"  title="+1° Ax1 / +1° Ax2"><i class="fa fa-arrow-up"    style="display:inline-block;transform:rotate(-45deg)"></i></button>
+      <button class="jog-btn jog-small" onclick="jog(1, 1)"       title="+1° Axis 1"><i class="fa fa-arrow-up"></i></button>
+      <button class="jog-btn jog-small" onclick="jogDiag( 1,-1)"  title="+1° Ax1 / -1° Ax2"><i class="fa fa-arrow-up"    style="display:inline-block;transform:rotate(45deg)"></i></button>
       <span></span>
 
-      <button class="jog-btn jog-big"   onclick="jog(1,-5)"       title="-5° Axis 1"><i class="fa fa-arrow-left"></i></button>
-      <button class="jog-btn jog-small" onclick="jog(1,-1)"       title="-1° Axis 1"><i class="fa fa-arrow-left"></i></button>
+      <button class="jog-btn jog-big"   onclick="jog(2, 5)"       title="+5° Axis 2"><i class="fa fa-arrow-left"></i></button>
+      <button class="jog-btn jog-small" onclick="jog(2, 1)"       title="+1° Axis 2"><i class="fa fa-arrow-left"></i></button>
       <button class="jog-btn jog-home"  onclick="jogHome()"       title="Home (0°, 0°)"><i class="fa fa-home"></i></button>
-      <button class="jog-btn jog-small" onclick="jog(1, 1)"       title="+1° Axis 1"><i class="fa fa-arrow-right"></i></button>
-      <button class="jog-btn jog-big"   onclick="jog(1, 5)"       title="+5° Axis 1"><i class="fa fa-arrow-right"></i></button>
+      <button class="jog-btn jog-small" onclick="jog(2,-1)"       title="-1° Axis 2"><i class="fa fa-arrow-right"></i></button>
+      <button class="jog-btn jog-big"   onclick="jog(2,-5)"       title="-5° Axis 2"><i class="fa fa-arrow-right"></i></button>
 
       <span></span>
-      <button class="jog-btn jog-small" onclick="jogDiag(-1,-1)"  title="-1° Ax1 / -1° Ax2"><i class="fa fa-arrow-down"  style="display:inline-block;transform:rotate(45deg)"></i></button>
-      <button class="jog-btn jog-small" onclick="jog(2,-1)"       title="-1° Axis 2"><i class="fa fa-arrow-down"></i></button>
-      <button class="jog-btn jog-small" onclick="jogDiag( 1,-1)"  title="+1° Ax1 / -1° Ax2"><i class="fa fa-arrow-down"  style="display:inline-block;transform:rotate(-45deg)"></i></button>
+      <button class="jog-btn jog-small" onclick="jogDiag(-1, 1)"  title="-1° Ax1 / +1° Ax2"><i class="fa fa-arrow-down"  style="display:inline-block;transform:rotate(45deg)"></i></button>
+      <button class="jog-btn jog-small" onclick="jog(1,-1)"       title="-1° Axis 1"><i class="fa fa-arrow-down"></i></button>
+      <button class="jog-btn jog-small" onclick="jogDiag(-1,-1)"  title="-1° Ax1 / -1° Ax2"><i class="fa fa-arrow-down"  style="display:inline-block;transform:rotate(-45deg)"></i></button>
       <span></span>
 
-      <button class="jog-btn jog-big"   onclick="jogDiag(-5,-5)"  title="-5° Ax1 / -5° Ax2"><i class="fa fa-arrow-down"  style="display:inline-block;transform:rotate(45deg)"></i></button>
+      <button class="jog-btn jog-big"   onclick="jogDiag(-5, 5)"  title="-5° Ax1 / +5° Ax2"><i class="fa fa-arrow-down"  style="display:inline-block;transform:rotate(45deg)"></i></button>
       <span></span>
-      <button class="jog-btn jog-big"   onclick="jog(2,-5)"       title="-5° Axis 2"><i class="fa fa-arrow-down"></i></button>
+      <button class="jog-btn jog-big"   onclick="jog(1,-5)"       title="-5° Axis 1"><i class="fa fa-arrow-down"></i></button>
       <span></span>
-      <button class="jog-btn jog-big"   onclick="jogDiag( 5,-5)"  title="+5° Ax1 / -5° Ax2"><i class="fa fa-arrow-down"  style="display:inline-block;transform:rotate(-45deg)"></i></button>
+      <button class="jog-btn jog-big"   onclick="jogDiag(-5,-5)"  title="-5° Ax1 / -5° Ax2"><i class="fa fa-arrow-down"  style="display:inline-block;transform:rotate(-45deg)"></i></button>
     </div>
 
     <hr>
@@ -103,12 +104,6 @@ function MovementControl() {
       </a>
     </div>
 
-    <hr>
-
-    <a href="#" class="button" style="display:block;"
-       id="btn-set-home" onclick="setHomeForAllAxes(); return false;">
-      Set Current Position As Home
-    </a>
   `;
 
   document.body.appendChild(panel);
@@ -189,6 +184,13 @@ function Calibration() {
 
     <a href="#" class="button" style="display:block;" id="btn-save-cal-nvm"
        onclick="saveCalibrationNVM(); return false;">Save Parameters</a>
+
+    <hr>
+
+    <a href="#" class="button" style="display:block;"
+       id="btn-set-home" onclick="setHomeForAllAxes(); return false;">
+      Set Current Position As Home
+    </a>
   `;
 
   document.body.appendChild(panel);

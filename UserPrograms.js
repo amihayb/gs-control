@@ -1,112 +1,292 @@
 /**
- * UserPrograms.js — Motion sequences for program buttons.
+ * UserProgramsFromExcel.js
+ * Auto-generated from sequence.xlsx — do not edit by hand.
+ * Copy the programs you need into UserPrograms.js.
  *
- * Edit ONLY this file to change or add movement programs.
- * Do NOT edit app.js or panelUI.js for program changes.
- *
- * Each step:
- *   ax1    — Axis 1 target position in degrees
- *   ax2    — Axis 2 target position in degrees
- *   waitMs — milliseconds to wait after the move command is sent
- *            before proceeding to the next step
- *
- * Both axes move simultaneously on each step.
- * Positions are clamped to ±MAX_TICKS by the move function.
- *
- * To add a new program:
- *   1. Define a new const PROGn = [ ... ] below.
- *   2. Add an entry to USER_PROGRAMS at the bottom of this file.
+ * Level lookup used:
+ *   Level 0: angle =  0°,  vel =  0 °/s
+ *   Level 1: angle =  4°,  vel =  1 °/s
+ *   Level 2: angle =  8°,  vel =  3 °/s
+ *   Level 3: angle = 10°,  vel =  5 °/s
+ *   Level 4: angle = 13°,  vel = 15 °/s
  */
 
-const PROG1 = [
-  { ax1:   0, ax2:   0, waitMs: 1000 },
-  { ax1:  15, ax2:   0, waitMs: 2000 },
-  { ax1:  15, ax2:  15, waitMs: 2000 },
-  { ax1:   0, ax2:  15, waitMs: 2000 },
-  { ax1: -15, ax2:  15, waitMs: 2000 },
-  { ax1: -15, ax2:   0, waitMs: 2000 },
-  { ax1: -15, ax2: -15, waitMs: 2000 },
-  { ax1:   0, ax2: -15, waitMs: 2000 },
-  { ax1:  15, ax2: -15, waitMs: 2000 },
-  { ax1:  15, ax2:   0, waitMs: 2000 },
-  { ax1:   0, ax2:   0, waitMs: 1000 },
+function repeat(steps, n) {
+  return Array.from({ length: n }, () => steps).flat();
+}
+
+const PROG_ANKLE = [
+  { ax1:    0, ax2:    0, vel:  3, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:    0, ax2:   -8, vel:  3, waitMs:  1000, info: 'אמצע - ימין' },
+    { ax1:    0, ax2:    0, vel:  3, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:    8, vel:  3, waitMs:  1000, info: 'אמצע - שמאל' },
+    { ax1:    0, ax2:    0, vel:  3, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:   -8, vel:  5, waitMs:  1000, info: 'אמצע - ימין' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:    8, vel:  5, waitMs:  1000, info: 'אמצע - שמאל' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG2 = [
-  { ax1:   0, ax2:   0, waitMs: 1000 },
-  { ax1: -10, ax2:   0, waitMs: 2000 },
-  { ax1:   0, ax2: -10, waitMs: 3000 },
-  { ax1:  10, ax2:   0, waitMs: 3000 },
-  { ax1:   0, ax2:  10, waitMs: 3000 },
-  { ax1:   0, ax2:   0, waitMs: 1000 },
+const PROG_SHOLDER = [
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:   10, ax2:    0, vel:  5, waitMs:  1000, info: 'קדימה - אמצע' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:   10, ax2:    0, vel:  5, waitMs:  1000, info: 'קדימה - אמצע' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:   10, ax2:    0, vel: 15, waitMs:  1000, info: 'קדימה - אמצע' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:   10, ax2:    0, vel: 15, waitMs:  1000, info: 'קדימה - אמצע' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG3 = [
-  { ax1:   0, ax2:   0, waitMs: 1000 },
-  { ax1:  15, ax2: -15, waitMs: 4000 },
-  { ax1: -15, ax2:  15, waitMs: 4000 },
-  { ax1:  15, ax2:  15, waitMs: 4000 },
-  { ax1: -15, ax2: -15, waitMs: 4000 },
-  { ax1:   0, ax2:   0, waitMs: 1000 },
+const PROG_WIDE_SIDES = [
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:  -10, ax2:    0, vel:  5, waitMs:  1000, info: 'אחורה - אמצע' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:    0, vel:  5, waitMs:  1000, info: 'אחורה - אמצע' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - אמצע' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - אמצע' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-
-const PROG4 = [
-  { ax1:   0, ax2:   0, waitMs: 1000 },
-  { ax1:  10, ax2: -10, waitMs: 1000 },
-  { ax1: -10, ax2: -10, waitMs: 1000 },
-  { ax1: -10, ax2:  10, waitMs: 1000 },
-  { ax1:  10, ax2:  10, waitMs: 1000 },
-  { ax1:  10, ax2: -10, waitMs: 1000 },
-  { ax1: -10, ax2: -10, waitMs: 1000 },
-  { ax1: -10, ax2:  10, waitMs: 1000 },
-  { ax1:  10, ax2:  10, waitMs: 1000 },
-  { ax1:  10, ax2: -10, waitMs: 1000 },
-  { ax1: -10, ax2: -10, waitMs: 1000 },
-  { ax1: -10, ax2:  10, waitMs: 1000 },
-  { ax1:  10, ax2:  10, waitMs: 1000 },
-  { ax1:   0, ax2:   0, waitMs: 1000 },
+const PROG_WIDE_FRONT = [
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:  -13, ax2:  -13, vel:  5, waitMs:  1000, info: 'אחורה - ימין' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -13, ax2:   13, vel:  5, waitMs:  1000, info: 'אחורה - שמאל' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -13, ax2:  -13, vel:  5, waitMs:  1000, info: 'אחורה - ימין' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -13, ax2:   13, vel:  5, waitMs:  1000, info: 'אחורה - שמאל' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG5 = [
-  { ax1:   0, ax2:   0, waitMs: 2000 },
-  { ax1:  0, ax2: -15, waitMs: 1000 },
-  { ax1: 0, ax2:  15, waitMs: 2000 },
-  { ax1:  0, ax2:  -15, waitMs: 2000 },
-  { ax1: -0, ax2: 15, waitMs: 2000 },
-  { ax1:   0, ax2:   0, waitMs: 2000 },
+const PROG_ELBOWS = [
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:  -10, ax2:  -10, vel:  5, waitMs:  1000, info: 'אחורה - קדימה - ימין' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:   10, vel:  5, waitMs:  1000, info: 'אחורה - קדימה - שמאל' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:  -10, vel: 15, waitMs:  1000, info: 'אחורה - קדימה - ימין' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:   10, vel: 15, waitMs:  1000, info: 'אחורה - קדימה - שמאל' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG6 = [
-  { ax1:   0, ax2:   0, waitMs: 2000 },
-  { ax1:  10, ax2: 0, waitMs: 2000 },
-  { ax1:   0, ax2:   0, waitMs: 2000 },
-  { ax1:  10, ax2: 0, waitMs: 2000 },
-  { ax1:   0, ax2:   0, waitMs: 2000 },
-  { ax1:  10, ax2: 0, waitMs: 2000 },
-  { ax1:   0, ax2:   0, waitMs: 2000 },
-  { ax1:  10, ax2: 0, waitMs: 2000 },
-  { ax1:   0, ax2:   0, waitMs: 2000 },
-  { ax1:  10, ax2: 0, waitMs: 2000 },
-  { ax1: 0, ax2:  0, waitMs: 20000 },
-  { ax1:  -10, ax2: 0, waitMs: 2000 },
-  { ax1:   0, ax2:   0, waitMs: 2000 },
-  { ax1:  -10, ax2: 0, waitMs: 2000 },
-  { ax1:   0, ax2:   0, waitMs: 2000 },
-  { ax1:  -10, ax2: 0, waitMs: 2000 },
-  { ax1:   0, ax2:   0, waitMs: 2000 },
-  { ax1:  -10, ax2: 0, waitMs: 2000 },
-  { ax1:   0, ax2:   0, waitMs: 2000 },
+const PROG_HORIZONTAL = [
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:   10, ax2:  -10, vel:  5, waitMs:  1000, info: 'ימין - קדימה' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:   10, ax2:   10, vel:  5, waitMs:  1000, info: 'שמאל - קדימה' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:   13, ax2:  -13, vel: 15, waitMs:  1000, info: 'ימין - קדימה' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:   13, ax2:   13, vel: 15, waitMs:  1000, info: 'שמאל - קדימה' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
+];
+
+const PROG_SQUAT = [
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:  -13, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - קדימה' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -13, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - קדימה' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -13, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - קדימה' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -13, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - קדימה' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
+];
+
+const PROG_CROSS = [
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'אמצע - ימין' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:   13, vel: 15, waitMs:  1000, info: 'אמצע - שמאל' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'אמצע - ימין' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:   13, vel: 15, waitMs:  1000, info: 'אמצע - שמאל' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
+];
+
+const PROG_LATERAL_GAP = [
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:  -10, ax2:  -10, vel:  5, waitMs:  1000, info: 'ימין - אחורה - קדימה' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:   10, vel:  5, waitMs:  1000, info: 'שמאל - אחורה - קדימה' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:  -10, vel: 15, waitMs:  1000, info: 'ימין - אחורה - קדימה' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:   10, vel: 15, waitMs:  1000, info: 'שמאל - אחורה - קדימה' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
+];
+
+const PROG_HIP_GAP = [
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:    0, ax2:  -10, vel:  5, waitMs:  1000, info: 'אמצע - ימין' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:   10, vel:  5, waitMs:  1000, info: 'אמצע - שמאל' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'אמצע - ימין' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:   13, vel: 15, waitMs:  1000, info: 'אמצע - שמאל' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
+];
+
+const PROG_CROSS_SQUAT = [
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:    0, ax2:   13, vel: 15, waitMs:  1000, info: 'אמצע - שמאל' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'אמצע - ימין' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:   13, vel: 15, waitMs:  1000, info: 'אמצע - שמאל' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'אמצע - ימין' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
+];
+
+const PROG_SOMETHING = [
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:  -13, ax2:   13, vel: 15, waitMs:  1000, info: 'אחורה - שמאל' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'אמצע' },
+    { ax1:   13, ax2:  -13, vel: 15, waitMs:  1000, info: 'קדימה - ימין' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 15),
+  ...repeat([
+    { ax1:  -13, ax2:   13, vel: 15, waitMs:  1000, info: 'אחורה - שמאל' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'אמצע' },
+    { ax1:   13, ax2:  -13, vel: 15, waitMs:  1000, info: 'קדימה - ימין' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 15),
+  ...repeat([
+    { ax1:   13, ax2:    0, vel: 15, waitMs:  1000, info: 'קדימה - אחורה' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'אמצע' },
+    { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'ימין - שמאל' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 15),
+  ...repeat([
+    { ax1:  -13, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - קדימה' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'אמצע' },
+    { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'ימין - שמאל' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 15),
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
 // ── Program registry ─────────────────────────────────────────────────────────
-// Add or remove entries here to control which buttons appear in the panel.
 const USER_PROGRAMS = [
-  { label: 'Program 1', steps: PROG1 },
-  { label: 'Program 2', steps: PROG2 },
-  { label: 'Edges', steps: PROG3 },
-  { label: 'Circles', steps: PROG4 },
-  { label: '67', steps: PROG5 },
-  { label: 'Right', steps: PROG6 },
+  { label: 'Ankle', steps: PROG_ANKLE },
+  { label: 'Sholder', steps: PROG_SHOLDER },
+  { label: 'Wide Sides', steps: PROG_WIDE_SIDES },
+  { label: 'Wide Front', steps: PROG_WIDE_FRONT },
+  { label: 'Elbows', steps: PROG_ELBOWS },
+  { label: 'Horizontal', steps: PROG_HORIZONTAL },
+  { label: 'Squat', steps: PROG_SQUAT },
+  { label: 'Cross', steps: PROG_CROSS },
+  { label: 'Lateral Gap', steps: PROG_LATERAL_GAP },
+  { label: 'Hip Gap', steps: PROG_HIP_GAP },
+  { label: 'Cross Squat', steps: PROG_CROSS_SQUAT },
+  { label: 'Something', steps: PROG_SOMETHING },
 ];
-
