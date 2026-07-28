@@ -428,12 +428,14 @@ async function runProgram(steps, label, btnId) {
 
   _progRunning = true;
   _progPaused  = false;
-  const btn = btnId ? document.getElementById(btnId) : null;
+  const btn    = btnId ? document.getElementById(btnId) : null;
+  const banner = $('step-banner');
 
   if (btn) {
     btn.classList.add('in-progress');
     btn.style.setProperty('--progress', '0%');
   }
+  if (banner) banner.style.setProperty('--progress', '0%');
 
   _setPauseBtnVisible(true);
   _setPauseBtnState(false);
@@ -445,7 +447,8 @@ async function runProgram(steps, label, btnId) {
     if (_progPaused) return;
     const elapsed = Date.now() - startTime - pausedAt;
     const pct = Math.min(99, Math.round((elapsed / totalMs) * 100));
-    if (btn) btn.style.setProperty('--progress', `${pct}%`);
+    if (btn)    btn.style.setProperty('--progress', `${pct}%`);
+    if (banner) banner.style.setProperty('--progress', `${pct}%`);
   }, 80);
 
   log(`=== ${label} start (${steps.length} steps, ~${(totalMs / 1000).toFixed(1)}s) ===`);
@@ -533,12 +536,16 @@ async function runProgram(steps, label, btnId) {
       _progPaused  = false;
       _setPauseBtnVisible(false);
       _setPauseBtnState(false);
+      if (banner) banner.style.setProperty('--progress', '100%');
       if (btn) {
         btn.style.setProperty('--progress', '100%');
         await new Promise(r => setTimeout(r, 300));
         btn.classList.remove('in-progress');
         btn.style.removeProperty('--progress');
+      } else {
+        await new Promise(r => setTimeout(r, 300));
       }
+      if (banner) banner.style.removeProperty('--progress');
     }
   })();
 
