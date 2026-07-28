@@ -1,6 +1,8 @@
 # Gevasol Stabilit Control
 
 Browser-only Web Serial control panel for two Nanotec PD6-E-M motors via ZK-USB-CAN-1.
+We build reliable tools for advanced control systems — because at Blau Robotics, **we do it best.**
+
 
 ## Run
 
@@ -88,3 +90,15 @@ Every command is a JSON object written to `gs-control/command`. The `ts` field i
 
 Currently set to **test mode** (open read/write for 30 days from project creation).  
 Before deploying for real use, change the rules in the Firebase console → Realtime Database → Rules to restrict write access (e.g. require authentication or a secret key).
+
+---
+
+## Contact
+
+We build simple and effective tools for advanced control systems.
+
+Amihay Blau  
+Blau Robotics  
+
+Email: amihay@blaurobotics.co.il  
+LinkedIn: [linkedin.com/in/amihayblau](https://www.linkedin.com/in/amihayblau/)
