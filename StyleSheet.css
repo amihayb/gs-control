@@ -729,6 +729,20 @@ input[type="text"] {
   color: var(--color-text-active);
 }
 
+#step-banner-countdown {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  min-height: 0;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  transition: color 0.3s ease;
+}
+
+#step-banner.running #step-banner-countdown {
+  color: var(--color-text-active);
+}
+
 #step-banner-step {
   font-size: 16px;
   font-weight: 500;

@@ -190,6 +190,36 @@
       100% { opacity: 1; }
     }
     .flash { animation: tap-flash 0.28s ease; }
+
+    /* Progress bar on running program button */
+    .prog-btn.in-progress {
+      background-color: var(--color-btn-hover-deep) !important;
+      color: #3276a0;
+      cursor: not-allowed;
+      pointer-events: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .prog-btn.in-progress::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 5px;
+      width: var(--progress, 0%);
+      background: #3276a0;
+      border-radius: 0 2px 2px 0;
+      transition: width 0.4s ease;
+    }
+
+    [data-theme="dark"] .prog-btn.in-progress {
+      color: #64d7d6;
+    }
+
+    [data-theme="dark"] .prog-btn.in-progress::after {
+      background: #64d7d6;
+    }
   </style>
 </head>
 <body>
@@ -228,7 +258,7 @@
       <button class="ctrl-btn pause-btn" onclick="send('pauseResume')">
         <i class="fa fa-pause"></i>&nbsp; Pause / Resume
       </button>
-      <button class="ctrl-btn stop-btn" onclick="send('stop')">
+      <button class="ctrl-btn stop-btn" onclick="send('stop'); clearProgress()">
         <i class="fa fa-stop"></i>&nbsp; Stop
       </button>
     </div>
@@ -286,6 +316,37 @@
       );
     }
 
+    // ── Progress bar ────────────────────────────────────────────────────
+    let _activeBtn = null;
+    let _progInterval = null;
+    let _progTimeout  = null;
+
+    function startProgress(btn, steps) {
+      clearProgress();
+      const totalMs = steps.reduce((sum, s) => sum + s.waitMs, 0);
+      _activeBtn = btn;
+      btn.classList.add('in-progress');
+      btn.style.setProperty('--progress', '0%');
+      const t0 = Date.now();
+      _progInterval = setInterval(() => {
+        const pct = Math.min(99, Math.round(((Date.now() - t0) / totalMs) * 100));
+        btn.style.setProperty('--progress', `${pct}%`);
+      }, 300);
+      _progTimeout = setTimeout(clearProgress, totalMs);
+    }
+
+    function clearProgress() {
+      if (_activeBtn) {
+        clearInterval(_progInterval);
+        clearTimeout(_progTimeout);
+        _activeBtn.classList.remove('in-progress');
+        _activeBtn.style.removeProperty('--progress');
+        _activeBtn = null;
+        _progInterval = null;
+        _progTimeout  = null;
+      }
+    }
+
     // ── Build program buttons ───────────────────────────────────────────
     const grid = document.getElementById('prog-grid');
 
@@ -295,7 +356,7 @@
       btn.textContent = p.label;
       btn.addEventListener('click', () => {
         send('runProgram', { program: p.label });
-        flash(btn);
+        startProgress(btn, p.steps);
       });
       grid.appendChild(btn);
     });

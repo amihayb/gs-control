@@ -36,6 +36,12 @@ function setStepBanner(programName, info, step) {
   if (infoEl) infoEl.textContent = info        || '';
   if (stepEl) stepEl.textContent = step        || '';
   if (banner) banner.classList.toggle('running', !!(programName && programName !== 'Ready'));
+  setStepCountdown('');
+}
+
+function setStepCountdown(text) {
+  const el = $('step-banner-countdown');
+  if (el) el.textContent = text || '';
 }
 
 // ==================== Theme ====================
@@ -432,7 +438,7 @@ async function runProgram(steps, label, btnId) {
   _setPauseBtnVisible(true);
   _setPauseBtnState(false);
 
-  const totalMs   = steps.reduce((sum, s) => sum + s.waitMs, 0);
+  const totalMs   = steps.reduce((sum, s) => sum + (s.waitMs ?? s.waitOnly ?? 0), 0);
   let   pausedAt  = 0;   // tracks accumulated pause time so progress bar doesn't drift
   const startTime = Date.now();
   const progressInterval = setInterval(() => {
@@ -456,13 +462,17 @@ async function runProgram(steps, label, btnId) {
           return;
         }
 
-        const { ax1, ax2, waitMs, vel, info, pause } = steps[i];
+        const { ax1, ax2, waitMs, vel, info, pause, waitOnly, rep, repTotal } = steps[i];
+        const isWaitOnly  = waitOnly != null;
         const isPauseLine = pause && ax1 == null && ax2 == null;
 
-        const infoStr = info ? ` — ${info}` : '';
-        setStepBanner(label, info || '', `Step ${i + 1} / ${steps.length}`);
+        const infoStr   = info ? ` — ${info}` : '';
+        const repSuffix = (rep && !isWaitOnly) ? ` — ${rep}/${repTotal}` : '';
+        setStepBanner(label, (info || '') + repSuffix, `Step ${i + 1} / ${steps.length}`);
 
-        if (isPauseLine) {
+        if (isWaitOnly) {
+          log(`  Step ${i + 1}/${steps.length}: ⏳ Wait ${waitOnly / 1000}s${infoStr}`);
+        } else if (isPauseLine) {
           // Pure pause line — no motor commands, just hold
           log(`  Step ${i + 1}/${steps.length}: ⏸ Pause${infoStr}`);
         } else {
@@ -485,12 +495,21 @@ async function runProgram(steps, label, btnId) {
           log(`⏸  Auto-pause at step ${i + 1} — press Resume to continue.`);
         }
 
-        // Wait waitMs in small slices so abort and pause both respond quickly
-        const stepWait = waitMs ?? 0;
+        // Wait in small slices so abort and pause both respond quickly
+        const stepWait = isWaitOnly ? waitOnly : (waitMs ?? 0);
         const end = Date.now() + stepWait;
+        let _lastCountSec = -1;
         while (Date.now() < end && _progRunning) {
+          if (stepWait > 2000) {
+            const remaining = Math.ceil((end - Date.now()) / 1000);
+            if (remaining !== _lastCountSec) {
+              _lastCountSec = remaining;
+              setStepCountdown(remaining > 0 ? `${remaining}s` : '');
+            }
+          }
           await new Promise(r => setTimeout(r, Math.min(50, end - Date.now())));
         }
+        setStepCountdown('');
 
         // If paused, hold here and accumulate pause time for the progress bar
         if (_progPaused) {
@@ -861,8 +880,9 @@ const _appStartTs = Date.now();
       log(`[Remote] ${cmd.type}${cmd.program ? ': ' + cmd.program : ''}`);
 
       if (cmd.type === "runProgram") {
-        const prog = USER_PROGRAMS.find(p => p.label === cmd.program);
-        if (prog) runProgram(prog.steps, prog.label);
+        const idx  = USER_PROGRAMS.findIndex(p => p.label === cmd.program);
+        const prog = idx >= 0 ? USER_PROGRAMS[idx] : null;
+        if (prog) runProgram(prog.steps, prog.label, `btn-prog-${idx + 1}`);
         else log(`[Remote] Unknown program: ${cmd.program}`);
       } else if (cmd.type === "stop") {
         abortProgram();

@@ -12,366 +12,295 @@
  */
 
 function repeat(steps, n) {
-  return Array.from({ length: n }, (_, i) =>
-    steps.map(s => ({ ...s, rep: i + 1, repTotal: n }))
-  ).flat();
+  return Array.from({ length: n }, () => steps).flat();
 }
 
-const PROG_1_ANKLE = [
+const PROG_ANKLE = [
   { ax1:    0, ax2:    0, vel:  3, waitMs:  1000, info: 'Home' },
   { waitOnly: 5000, info: 'Stand on Right Leg' },
   ...repeat([
     { ax1:    0, ax2:   -8, vel:  3, waitMs:  1000, info: 'אמצע - ימין' },
     { ax1:    0, ax2:    0, vel:  3, waitMs:  3000, info: 'אמצע' },
-  ], 5),
+  ], 10),
   { waitOnly: 15000, info: 'Switch to Left Leg' },
   ...repeat([
     { ax1:    0, ax2:    8, vel:  3, waitMs:  1000, info: 'אמצע - שמאל' },
     { ax1:    0, ax2:    0, vel:  3, waitMs:  3000, info: 'אמצע' },
-  ], 5),
+  ], 10),
   { waitOnly: 15000, info: 'Switch to Right Leg' },
   ...repeat([
     { ax1:    0, ax2:   -8, vel:  5, waitMs:  1000, info: 'אמצע - ימין' },
     { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
-  ], 5),
+  ], 10),
   { waitOnly: 15000, info: 'Switch to Left Leg' },
   ...repeat([
     { ax1:    0, ax2:    8, vel:  5, waitMs:  1000, info: 'אמצע - שמאל' },
     { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
-  ], 5),
+  ], 10),
   { waitOnly: 3000, info: 'Well Done!' },
   { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG_2_SHOLDER_PRESS = [
+const PROG_SHOLDER = [
   { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
-  { pause: true, info: 'Take Weights' },
   ...repeat([
-    { ax1:   10, ax2:    0, vel:  5, waitMs:  3000, info: 'קדימה - אמצע' },
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'אמצע' },
-  ], 5),
+    { ax1:   10, ax2:    0, vel:  5, waitMs:  1000, info: 'קדימה - אמצע' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
   { waitOnly: 15000, info: 'Switch Leg' },
   ...repeat([
-    { ax1:   10, ax2:    0, vel:  5, waitMs:  3000, info: 'קדימה - אמצע' },
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'אמצע' },
-  ], 5),
+    { ax1:   10, ax2:    0, vel:  5, waitMs:  1000, info: 'קדימה - אמצע' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
   { waitOnly: 15000, info: 'Switch Leg' },
   ...repeat([
-    { ax1:   10, ax2:    0, vel: 15, waitMs:  3000, info: 'קדימה - אמצע' },
-    { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'אמצע' },
-  ], 5),
+    { ax1:   10, ax2:    0, vel: 15, waitMs:  1000, info: 'קדימה - אמצע' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
   { waitOnly: 15000, info: 'Switch Leg' },
   ...repeat([
-    { ax1:   10, ax2:    0, vel: 15, waitMs:  3000, info: 'קדימה - אמצע' },
-    { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 3000, info: 'Well Done!' },
-  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
-];
-
-const PROG_3_SIDE_FLYS = [
-  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
-  { waitOnly: 5000, info: 'Get Ready!' },
-  ...repeat([
-    { ax1:  -10, ax2:    0, vel:  5, waitMs:  3000, info: 'אחורה - אמצע' },
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch Leg' },
-  ...repeat([
-    { ax1:  -10, ax2:    0, vel:  5, waitMs:  3000, info: 'אחורה - אמצע' },
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch Leg' },
-  ...repeat([
-    { ax1:  -10, ax2:    0, vel: 15, waitMs:  3000, info: 'אחורה - אמצע' },
-    { ax1:    0, ax2:    0, vel: 15, waitMs:  2000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch Leg' },
-  ...repeat([
-    { ax1:  -10, ax2:    0, vel: 15, waitMs:  3000, info: 'אחורה - אמצע' },
-    { ax1:    0, ax2:    0, vel: 15, waitMs:  2000, info: 'אמצע' },
-  ], 5),
+    { ax1:   10, ax2:    0, vel: 15, waitMs:  1000, info: 'קדימה - אמצע' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
   { waitOnly: 3000, info: 'Well Done!' },
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG_4_FRONT_RAISE = [
-  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' }, 
-  { pause: true, info: 'Take Dumbbells' },
-  { waitOnly: 5000, info: 'Stand on Right Leg' },
+const PROG_WIDE_SIDES = [
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
+  { waitOnly: 15000, info: 'Switch Leg' },
   ...repeat([
-    { ax1:  0, ax2:  -13, vel:  5, waitMs:  2600, info: 'ימין' },
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2600, info: 'אמצע' },
-    { ax1:  -13, ax2:  0, vel:  5, waitMs:  5600, info: 'אחורה'},
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  3600, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+    { ax1:  -10, ax2:    0, vel:  5, waitMs:  1000, info: 'אחורה - אמצע' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  { waitOnly: 15000, info: 'Switch Leg' },
   ...repeat([
-    { ax1:  0, ax2:  13, vel:  5, waitMs:  2600, info: 'שמאל' },
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2600, info: 'אמצע' },
-    { ax1:  -13, ax2:  0, vel:  5, waitMs:  5600, info: 'אחורה'},
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  3600, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Right Leg' },
+    { ax1:  -10, ax2:    0, vel:  5, waitMs:  1000, info: 'אחורה - אמצע' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  { waitOnly: 15000, info: 'Switch Leg' },
   ...repeat([
-    { ax1:  0, ax2:  -13, vel:  5, waitMs:  2600, info: 'ימין' },
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2600, info: 'אמצע' },
-    { ax1:  -13, ax2:  0, vel:  5, waitMs:  5600, info: 'אחורה'},
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  3600, info: 'אמצע' },
-  ], 5), 
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+    { ax1:  -10, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - אמצע' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
+  { waitOnly: 15000, info: 'Switch Leg' },
   ...repeat([
-    { ax1:  0, ax2:  13, vel:  5, waitMs:  2600, info: 'שמאל' },
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2600, info: 'אמצע' },
-    { ax1:  -13, ax2:  0, vel:  5, waitMs:  5600, info: 'אחורה'},
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  3600, info: 'אמצע' },
-  ], 5),
+    { ax1:  -10, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - אמצע' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
+  ], 10),
   { waitOnly: 3000, info: 'Well Done!' },
-  { ax1:    0, ax2:    0, vel:  5, waitMs:  2000, info: 'Home' },
+  { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG_5_BICEP_CURL = [
+const PROG_WIDE_FRONT = [
   { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
-  { pause: true, info: 'Take Dumbbells' },
-  { waitOnly: 5000, info: 'Stad on Right Leg' },
   ...repeat([
-    { ax1:  0, ax2:  -13, vel:  5, waitMs:  2600, info: 'ימין' },
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2600, info: 'אמצע' },
-    { ax1:  13, ax2:  0, vel:  5, waitMs:  2600, info: 'קדימה'},
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2600, info: 'אמצע' },
-    { ax1:  -13, ax2:  0, vel:  5, waitMs:  5600, info: 'אחורה'},
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2600, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+    { ax1:  -13, ax2:  -13, vel:  5, waitMs:  1000, info: 'אחורה - ימין' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
   ...repeat([
-    { ax1:  0, ax2:  13, vel:  5, waitMs:  2600, info: 'שמאל' },
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2600, info: 'אמצע' },
-    { ax1:  13, ax2:  0, vel:  5, waitMs:  2600, info: 'קדימה'},
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2600, info: 'אמצע' },
-    { ax1:  -13, ax2:  0, vel:  5, waitMs:  5600, info: 'אחורה'},
-    { ax1:    0, ax2:    0, vel:  5, waitMs:  2600, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Right Leg' },
+    { ax1:  -13, ax2:   13, vel:  5, waitMs:  1000, info: 'אחורה - שמאל' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
   ...repeat([
-    { ax1:  0, ax2:  -13, vel:  15, waitMs:  1000, info: 'ימין' },
-    { ax1:    0, ax2:    0, vel:  15, waitMs:  1000, info: 'אמצע' },
-    { ax1:  13, ax2:  0, vel:  15, waitMs:  1000, info: 'קדימה'},
-    { ax1:    0, ax2:    0, vel:  15, waitMs:  1000, info: 'אמצע' },
-    { ax1:  -13, ax2:  0, vel:  15, waitMs: 5000, info: 'אחורה'},
-    { ax1:    0, ax2:    0, vel:  15, waitMs:  1000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+    { ax1:  -13, ax2:  -13, vel:  5, waitMs:  1000, info: 'אחורה - ימין' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -13, ax2:   13, vel:  5, waitMs:  1000, info: 'אחורה - שמאל' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
+];
+
+const PROG_ELBOWS = [
+  { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
+  ...repeat([
+    { ax1:  -10, ax2:  -10, vel:  5, waitMs:  1000, info: 'אחורה - קדימה - ימין' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:   10, vel:  5, waitMs:  1000, info: 'אחורה - קדימה - שמאל' },
+    { ax1:    0, ax2:    0, vel:  5, waitMs:  4000, info: 'אמצע' },
+  ], 10),
+  ...repeat([
+    { ax1:  -10, ax2:  -10, vel: 15, waitMs:  1000, info: 'אחורה - קדימה - ימין' },
+    { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
+  ], 10),
   ...repeat([
     { ax1:  -10, ax2:   10, vel: 15, waitMs:  1000, info: 'אחורה - קדימה - שמאל' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 3000, info: 'Well Done!' },
+  ], 10),
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG_6_CHEST_FLY = [
+const PROG_HORIZONTAL = [
   { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
-  { waitOnly: 5000, info: 'Stad on Right Leg' },
   ...repeat([
     { ax1:   10, ax2:  -10, vel:  5, waitMs:  1000, info: 'ימין - קדימה' },
     { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 10),
   ...repeat([
     { ax1:   10, ax2:   10, vel:  5, waitMs:  1000, info: 'שמאל - קדימה' },
     { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Right Leg' },
+  ], 10),
   ...repeat([
     { ax1:   13, ax2:  -13, vel: 15, waitMs:  1000, info: 'ימין - קדימה' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 10),
   ...repeat([
     { ax1:   13, ax2:   13, vel: 15, waitMs:  1000, info: 'שמאל - קדימה' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 3000, info: 'Well Done!' },
+  ], 10),
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG_7_TRICEPS_SL = [
+const PROG_SQUAT = [
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
-  { waitOnly: 5000, info: 'Stad on One Leg' },
   ...repeat([
     { ax1:  -13, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - קדימה' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Other Leg' },
+  ], 10),
   ...repeat([
     { ax1:  -13, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - קדימה' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Other Leg' },
+  ], 10),
   ...repeat([
     { ax1:  -13, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - קדימה' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Other Leg' },
+  ], 10),
   ...repeat([
     { ax1:  -13, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - קדימה' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 3000, info: 'Well Done!' },
+  ], 10),
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG_8_KETTLEBELL_ROTATION = [
+const PROG_CROSS = [
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
-  { waitOnly: 5000, info: 'Stad on Right Leg' },
   ...repeat([
     { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'אמצע - ימין' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 10),
   ...repeat([
     { ax1:    0, ax2:   13, vel: 15, waitMs:  1000, info: 'אמצע - שמאל' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Right Leg' },
+  ], 10),
   ...repeat([
     { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'אמצע - ימין' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 10),
   ...repeat([
     { ax1:    0, ax2:   13, vel: 15, waitMs:  1000, info: 'אמצע - שמאל' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 3000, info: 'Well Done!' },
+  ], 10),
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG_9_BAND_EXTENSION = [
+const PROG_LATERAL_GAP = [
   { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
-  { waitOnly: 5000, info: 'Stad on Right Leg' },
   ...repeat([
     { ax1:  -10, ax2:  -10, vel:  5, waitMs:  1000, info: 'ימין - אחורה - קדימה' },
     { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 10),
   ...repeat([
     { ax1:  -10, ax2:   10, vel:  5, waitMs:  1000, info: 'שמאל - אחורה - קדימה' },
     { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Right Leg' },
+  ], 10),
   ...repeat([
     { ax1:  -10, ax2:  -10, vel: 15, waitMs:  1000, info: 'ימין - אחורה - קדימה' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 10),
   ...repeat([
     { ax1:  -10, ax2:   10, vel: 15, waitMs:  1000, info: 'שמאל - אחורה - קדימה' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 3000, info: 'Well Done!' },
+  ], 10),
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG_10_HIP_OPEN = [
+const PROG_HIP_GAP = [
   { ax1:    0, ax2:    0, vel:  5, waitMs:  1000, info: 'Home' },
-  { waitOnly: 5000, info: 'Stad on Right Leg' },
   ...repeat([
     { ax1:    0, ax2:  -10, vel:  5, waitMs:  1000, info: 'אמצע - ימין' },
     { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 10),
   ...repeat([
     { ax1:    0, ax2:   10, vel:  5, waitMs:  1000, info: 'אמצע - שמאל' },
     { ax1:    0, ax2:    0, vel:  5, waitMs:  3000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Right Leg' },
+  ], 10),
   ...repeat([
     { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'אמצע - ימין' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 10),
   ...repeat([
     { ax1:    0, ax2:   13, vel: 15, waitMs:  1000, info: 'אמצע - שמאל' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 3000, info: 'Well Done!' },
+  ], 10),
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG_11_DOUBLE_LEG_SQUAT = [
+const PROG_CROSS_SQUAT = [
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
-  { waitOnly: 5000, info: 'Stad on Left Leg' },
   ...repeat([
     { ax1:    0, ax2:   13, vel: 15, waitMs:  1000, info: 'אמצע - שמאל' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Right Leg' },
+  ], 10),
   ...repeat([
     { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'אמצע - ימין' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 10),
   ...repeat([
     { ax1:    0, ax2:   13, vel: 15, waitMs:  1000, info: 'אמצע - שמאל' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Right Leg' },
+  ], 10),
   ...repeat([
     { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'אמצע - ימין' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 3000, info: 'Well Done!' },
+  ], 10),
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
-const PROG_12_SL_BALANCE = [
+const PROG_SOMETHING = [
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
-  { pause: true, info: 'Take Weight Vest' },
-  { waitOnly: 5000, info: 'Stad on Right Leg' },
   ...repeat([
     { ax1:  -13, ax2:   13, vel: 15, waitMs:  1000, info: 'אחורה - שמאל' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'אמצע' },
     { ax1:   13, ax2:  -13, vel: 15, waitMs:  1000, info: 'קדימה - ימין' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 15),
   ...repeat([
     { ax1:  -13, ax2:   13, vel: 15, waitMs:  1000, info: 'אחורה - שמאל' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'אמצע' },
     { ax1:   13, ax2:  -13, vel: 15, waitMs:  1000, info: 'קדימה - ימין' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Right Leg' },
+  ], 15),
   ...repeat([
     { ax1:   13, ax2:    0, vel: 15, waitMs:  1000, info: 'קדימה - אחורה' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'אמצע' },
     { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'ימין - שמאל' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 15000, info: 'Switch to Left Leg' },
+  ], 15),
   ...repeat([
     { ax1:  -13, ax2:    0, vel: 15, waitMs:  1000, info: 'אחורה - קדימה' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'אמצע' },
     { ax1:    0, ax2:  -13, vel: 15, waitMs:  1000, info: 'ימין - שמאל' },
     { ax1:    0, ax2:    0, vel: 15, waitMs:  4000, info: 'אמצע' },
-  ], 5),
-  { waitOnly: 3000, info: 'Well Done!' },
+  ], 15),
   { ax1:    0, ax2:    0, vel: 15, waitMs:  1000, info: 'Home' },
 ];
 
 // ── Program registry ─────────────────────────────────────────────────────────
 const USER_PROGRAMS = [
-  { label: '1 Ankle', steps: PROG_1_ANKLE },
-  { label: '2 Sholder Press', steps: PROG_2_SHOLDER_PRESS },
-  { label: '3 Side Flys', steps: PROG_3_SIDE_FLYS },
-  { label: '4 Front Raise', steps: PROG_4_FRONT_RAISE },
-  { label: '5 Bicep Curl', steps: PROG_5_BICEP_CURL },
-  { label: '6 Chest Fly', steps: PROG_6_CHEST_FLY },
-  { label: '7 Triceps SL', steps: PROG_7_TRICEPS_SL },
-  { label: '8 Kettlbell Rotation', steps: PROG_8_KETTLEBELL_ROTATION },
-  { label: '9 Band Extention', steps: PROG_9_BAND_EXTENSION },
-  { label: '10 Hip Open', steps: PROG_10_HIP_OPEN },
-  { label: '11 Double Leg Squat', steps: PROG_11_DOUBLE_LEG_SQUAT },
-  { label: '12 SL Balance', steps: PROG_12_SL_BALANCE },
+  { label: '1 Ankle', steps: PROG_ANKLE },
+  { label: '2 Sholder Press', steps: PROG_SHOLDER },
+  { label: '3 Flys', steps: PROG_WIDE_SIDES },
+  { label: '4 Front Raise', steps: PROG_WIDE_FRONT },
+  { label: '5 Bicep Curl', steps: PROG_ELBOWS },
+  { label: '6 Chest Fly', steps: PROG_HORIZONTAL },
+  { label: '7 Triceps SL', steps: PROG_SQUAT },
+  { label: '8 Kettlbell Rotation', steps: PROG_CROSS },
+  { label: '9 Band Extention', steps: PROG_LATERAL_GAP },
+  { label: '10 Hip Open', steps: PROG_HIP_GAP },
+  { label: '11 Double Leg Squat', steps: PROG_CROSS_SQUAT },
+  { label: '12 SL Balance', steps: PROG_SOMETHING },
 ];
