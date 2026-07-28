@@ -277,16 +277,16 @@ const PROG_SOMETHING = [
 
 // ── Program registry ─────────────────────────────────────────────────────────
 const USER_PROGRAMS = [
-  { label: 'Ankle', steps: PROG_ANKLE },
-  { label: 'Sholder', steps: PROG_SHOLDER },
-  { label: 'Wide Sides', steps: PROG_WIDE_SIDES },
-  { label: 'Wide Front', steps: PROG_WIDE_FRONT },
-  { label: 'Elbows', steps: PROG_ELBOWS },
-  { label: 'Horizontal', steps: PROG_HORIZONTAL },
-  { label: 'Squat', steps: PROG_SQUAT },
-  { label: 'Cross', steps: PROG_CROSS },
-  { label: 'Lateral Gap', steps: PROG_LATERAL_GAP },
-  { label: 'Hip Gap', steps: PROG_HIP_GAP },
-  { label: 'Cross Squat', steps: PROG_CROSS_SQUAT },
-  { label: 'Something', steps: PROG_SOMETHING },
+  { label: '1 Ankle', steps: PROG_ANKLE },
+  { label: '2 Sholder Press', steps: PROG_SHOLDER },
+  { label: '3 Flys', steps: PROG_WIDE_SIDES },
+  { label: '4 Front Raise', steps: PROG_WIDE_FRONT },
+  { label: '5 Bicep Curl', steps: PROG_ELBOWS },
+  { label: '6 Chest Fly', steps: PROG_HORIZONTAL },
+  { label: '7 Triceps SL', steps: PROG_SQUAT },
+  { label: '8 Kettlbell Rotation', steps: PROG_CROSS },
+  { label: '9 Band Extention', steps: PROG_LATERAL_GAP },
+  { label: '10 Hip Open', steps: PROG_HIP_GAP },
+  { label: '11 Double Leg Squat', steps: PROG_CROSS_SQUAT },
+  { label: '12 SL Balance', steps: PROG_SOMETHING },
 ];

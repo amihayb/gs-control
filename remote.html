@@ -154,7 +154,7 @@
     /* ── Program grid ─────────────────────────────────────────────── */
     .prog-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 8px;
     }
 
@@ -181,11 +181,6 @@
     .random-btn {
       background-color: var(--color-btn-active);
       color: var(--color-text-active);
-    }
-
-    /* Odd last button spans both columns */
-    .prog-btn:last-child:nth-child(odd) {
-      grid-column: span 2;
     }
 
     /* Brief flash on tap to confirm send */
