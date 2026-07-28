@@ -24,7 +24,7 @@ Travel is clamped to ±20 000 ticks on both axes.
 | `nanotec-canopen.js` | Low-level serial, CANopen SDO read/write, enable/disable/move/homing |
 | `app.js` | UI state, event handlers, polling, unit conversion |
 | `panelUI.js` | Movement Control sliding panel — buttons, jog grid, target inputs |
-| `UserPrograms.js` | Pre-defined motion programs (Prog 1 / 2 / 3) |
+| `UserPrograms.js` | 12 pre-defined motion programs (Ankle Stability → SL Balance) |
 | `index.html` | Layout only |
 | `StyleSheet.css` | Visual style |
 
@@ -47,14 +47,42 @@ The desktop app listens for commands sent by the mobile PWA via Firebase Realtim
 
 ### Command format written by the mobile app
 
-```json
-{ "type": "runProgram", "program": "Ankle", "ts": 1722031234567 }
-{ "type": "stop",        "ts": 1722031234567 }
-{ "type": "emergencyStop", "ts": 1722031234567 }
-```
+Every command is a JSON object written to `gs-control/command`. The `ts` field is `Date.now()` — it must change on every press so Firebase fires the listener.
 
-`program` must match a label in `USER_PROGRAMS` (e.g. `"Ankle"`, `"Squat"`, `"Hip Gap"`).  
-`ts` is `Date.now()` — it must change on every press so Firebase fires the listener.
+| `type` | Extra fields | Action |
+|---|---|---|
+| `runProgram` | `program` | Run a named program |
+| `stop` | — | Abort current program |
+| `pauseResume` | — | Toggle pause/resume |
+| `jog` | `axis` (`1`\|`2`), `delta` (degrees) | Jog one axis by ±degrees |
+| `jogHome` | — | Move both axes to home (0°, 0°) |
+
+#### `runProgram` — available programs
+
+| `program` value | Description |
+|---|---|
+| `1 Ankle Stability` | Single-leg ankle tilt, both legs, 2 speeds |
+| `2 Shoulder Press` | Forward tilt press on single leg, 2 speeds |
+| `3 Side Flys` | Backward tilt fly on single leg, 2 speeds |
+| `4 Front Raise` | Side + backward raise, both legs, 2 speeds |
+| `5 Bicep Curl` | Side + forward + backward, both legs, 2 speeds |
+| `6 Chest Fly` | Forward + side fly, both legs, 2 speeds |
+| `7 Triceps SL Squat` | Forward/backward on single leg, 4 sets |
+| `8 Kettlebell Rotation` | Side rotation on single leg, both sides, 2 rounds |
+| `9 Band Extension` | Forward + backward + side, both legs, 2 speeds |
+| `10 Hip Open` | Side tilt hip open, both legs, 2 speeds |
+| `11 Double Leg Squat` | Side rotation squat with band, 4 sets |
+| `12 SL Balance` | Diagonal balance challenge on single leg, 4 sets |
+
+#### Examples
+
+```json
+{ "type": "runProgram", "program": "1 Ankle Stability", "ts": 1722031234567 }
+{ "type": "stop",       "ts": 1722031234568 }
+{ "type": "pauseResume","ts": 1722031234569 }
+{ "type": "jog",        "axis": 1, "delta": 5, "ts": 1722031234570 }
+{ "type": "jogHome",    "ts": 1722031234571 }
+```
 
 ### Database security rules
 
